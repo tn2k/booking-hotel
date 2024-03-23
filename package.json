@@ -1,0 +1,36 @@
+{
+  "name": "booking-hotel",
+  "version": "1.0.0",
+  "description": "booking hotel",
+  "main": "sever.js",
+  "scripts": {
+    "test": "ngay 1",
+    "start": "nodemon ./src/backEnd.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tn2k/booking-hotel.git"
+  },
+  "keywords": [
+    "bookingHotel"
+  ],
+  "author": "tndev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tn2k/booking-hotel/issues"
+  },
+  "homepage": "https://github.com/tn2k/booking-hotel#readme",
+  "devDependencies": {
+    "dotenv": "^16.3.2",
+    "ejs": "^3.1.9",
+    "mysql2": "^3.7.1",
+    "nodemon": "^3.0.3",
+    "sequelize-cli": "^6.6.2",
+    "view-engine": "^1.1.1"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "express": "^4.18.2",
+    "sequelize": "^6.35.2"
+  }
+}
