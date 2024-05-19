@@ -1,6 +1,6 @@
 const connection = require("../config/connectDB");
 
-const homePage = async (req, res) => {
+const homePage = async (req, res, next) => {
   try {
     let [results, fields] = await connection
       .promise()
@@ -12,7 +12,7 @@ const homePage = async (req, res) => {
   }
 };
 
-const getAllUser = async (req, res) => {
+const getAllUsers = async (req, res, next) => {
   try {
     let [results, fields] = await connection
       .promise()
@@ -30,7 +30,7 @@ const getAllUser = async (req, res) => {
 };
 
 
-const createNewUser = async (req, res) => {
+const createNewUser = async (req, res, next) => {
   let { firstName, lastName, email, password, phonenumber, gender, roleId } =
     req.body;
   try {
@@ -50,28 +50,73 @@ const createNewUser = async (req, res) => {
   }
 };
 
-const Create = async (req, res) => {
+const registerUser = async (req, res, next) => {
   return res.render("createCrud.ejs");
 };
 
-const geteditUser = (req, res) => {
-  return res.render("editCRUD.ejs");
+const getEditUser = async (req, res, next) => {
+  let userId = req.params.id;
+  try {
+    const [results, fields] = await connection
+      .promise()
+      .execute(
+        `SELECT * FROM Users WHERE id = ?`,
+        [userId]
+      );
+    return res.render("editCRUD.ejs", { updateUser: results });
+  } catch (error) {
+    console.error("Error retrieving user:", error);
+    return res.status(500).send("Internal Server Error");
+  }
 };
 
-const putUser = (req, res) => {
-  return res.render("editCRUD.ejs");
+const updateUser = async (req, res, next) => {
+  let { firstName, lastName, phonenumber, id } = req.body;
+  try {
+    const [results, fields] = await connection
+      .promise()
+      .execute(
+        `UPDATE Users
+      SET firstName = ?, lastName = ?, phonenumber = ?
+      
+      WHERE id = ? ;`,
+        [firstName, lastName, phonenumber, id]
+      );
+    return res.status(201).json({
+      EC: 0,
+      EM: 'Update user success!',
+    });
+  } catch (error) {
+    console.error("Error Update user:", error);
+    return res.status(500).send("Internal Server Error");
+  }
 };
 
-const deleteUser = (req, res) => {
-  return res.render("editCRUD.ejs");
+const deleteUser = async (req, res, next) => {
+  let userId = req.params.id;
+  try {
+    await connection
+      .promise()
+      .execute(
+        `DELETE FROM Users WHERE id = ${userId} ;`,
+      );
+    return res.status(201).json({
+      EC: 0,
+      EM: 'Delete user success!',
+    });
+  } catch (error) {
+    console.error("Error Delete user:", error);
+    return res.status(500).send("Internal Server Error");
+  }
 };
+
 
 module.exports = {
-  getAllUser,
+  getAllUsers,
   createNewUser,
+  registerUser,
   homePage,
-  geteditUser,
-  putUser,
+  getEditUser,
+  updateUser,
   deleteUser,
-  Create,
 };

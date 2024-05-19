@@ -1,61 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
     <title>Get CRUD</title>
-    <link rel="stylesheet" href="css/allUser.scss">
-</head>
+    <link rel="stylesheet" href="../../public/css/display.scss" />
+  </head>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      border: 1px solid #ddd;
+    }
 
-<body>
+    th,
+    td {
+      text-align: left;
+      padding: 8px;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    tr:hover {
+      background-color: #f2f2f2;
+    }
+
+    .btn-edit {
+      outline: none;
+      border: 2px solid transparent;
+      background-color: blue;
+      height: 30px;
+      padding: 6px 12px;
+      cursor: pointer;
+      border-radius: 4px;
+      margin-left: 5px;
+    }
+
+    .btn-delete {
+      outline: none;
+      border: 2px solid transparent;
+      background-color: rgb(255, 0, 0);
+      height: 30px;
+      padding: 6px 12px;
+
+      cursor: pointer;
+      border-radius: 4px;
+      margin-left: 5px;
+    }
+  </style>
+  <body>
     <h2>Bảng Đẹp</h2>
+    <a href="/v1/register"><button>Create new User</button></a>
     <table action="/" method="get">
-        <tr>
-            <th>Id</th>
-            <th>Email</th>
-            <th>Password</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Phone Number</th>
-            <th>Gender</th>
-            <th>RoleId</th>
-            <th>Action</th>
-        </tr>
-        <% listUsers.forEach(function(User) { %>
-            <tr>
-                <td>
-                    <%= User.id %>
-                </td>
-                <td>
-                    <%= User.firstName %>
-                </td>
-                <td>
-                    <%= User.lastName %>
-                </td>
-                <td>
-                    <%= User.email %>
-                </td>
-                <td>
-                    <%= User.password %>
-                </td>
-                
-                <td>
-                    <%= User.phonenumber %>
-                </td>
-                <td>
-                    <%= User.gender %>
-                </td>
-                <td>
-                    <%= User.roleId %>
-                </td>
-                <td>
-                    <a href="/edit-User/<%= User.id %>"><i class="fa-regular fa-pen-to-square"></i></a>
-                    <a href="/delete-User/<%= User.id %>"><i class="fa-solid fa-trash"></i></a>
-                </td>
-            </tr>
-            <% }); %>
+      <tr>
+        <th>Id</th>
+        <th>Email</th>
+        <th>Last Name</th>
+        <th>First Name</th>
+        <th>Password</th>
+        <th>Phone Number</th>
+        <th>Gender</th>
+        <th>RoleId</th>
+        <th>Action</th>
+      </tr>
+      <% listUsers.forEach(function(User) { %>
+      <tr>
+        <td><%= User.id %></td>
+        <td><%= User.firstName %></td>
+        <td><%= User.lastName %></td>
+        <td><%= User.email %></td>
+        <td><%= User.password %></td>
+        <td><%= User.phonenumber %></td>
+        <td><%= User.gender %></td>
+        <td><%= User.roleId %></td>
+        <td>
+          <a href="/v1/edit-user/<%= User.id %>"
+            ><i class="fa-regular fa-pen-to-square"></i
+          ></a>
+          <a href="/v1/delete-user/<%= User.id %>"
+            ><i class="fa-solid fa-trash"></i
+          ></a>
+        </td>
+      </tr>
+      <% }); %>
     </table>
-</body>
-
+  </body>
 </html>

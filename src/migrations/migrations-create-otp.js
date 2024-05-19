@@ -11,35 +11,11 @@ module.exports = {
       },
       email: {
         type: Sequelize.STRING,
-        unique: true
-      },
-      password: {
-        type: Sequelize.STRING,
-      },
-      firstName: {
-        type: Sequelize.STRING,
-      },
-      lastName: {
-        type: Sequelize.STRING,
-      },
-      phonenumber: {
-        type: Sequelize.BIGINT,
-      },
-      gender: {
-        type: Sequelize.ENUM,
-        values: ["Male", "Female", "Other"],
-      },
-      roleId: {
-        type: Sequelize.ENUM,
-        values: ["Admin", "User", "Tenant"],
       },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW
       },
     });
   },

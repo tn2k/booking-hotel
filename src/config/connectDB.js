@@ -1,7 +1,6 @@
 const mysql = require('mysql2');
 require('dotenv').config()
 
-
 const connection = mysql.createConnection({
     host: process.env.DB_HOST,
     port: process.env.DB_PORT, // default: 3306
@@ -16,6 +15,37 @@ const connection = mysql.createConnection({
     enableKeepAlive: true,
     keepAliveInitialDelay: 0,
 })
+
+connection.connect((err) => {
+    if (err) {
+        console.error(`Mysql ::: error ::: ${JSON.stringify(err)}`);
+        return;
+    }
+    console.log(`Mysql ::: connected ::: ${connection.config.database}`);
+});
+
+// end connection database
+connection.on('end', () => {
+    console.log(`Mysql ::: disconnected ::: ${connection.config.database}`);
+});
+
+// error connection database
+connection.on('error', (err) => {
+    console.error(`Mysql ::: error ::: ${JSON.stringify(err)}`);
+});
+
+// listen to SIGINT to end connection app
+process.on('SIGINT', async () => {
+    connection.end((err) => {
+        if (err) {
+            console.error(`Mysql ::: error ending connection ::: ${JSON.stringify(err)}`);
+        } else {
+            console.log('Mysql ::: connection closed gracefully');
+        }
+        process.exit(0);
+    });
+});
+
 
 
 
