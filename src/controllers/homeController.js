@@ -1,52 +1,32 @@
+const createHttpError = require("http-errors");
 const connection = require("../config/connectDB");
+const { getAllUsers, createUser, getDataUser, updateDataUser, deleteDataUser } = require("../services/user.service");
+
 
 const homePage = async (req, res, next) => {
+  console.log('check data ', req.headers);
   try {
-    let [results, fields] = await connection
-      .promise()
-      .query(`SELECT * FROM Users`);
-    return res.render("displayCRUD.ejs", { listUsers: results });
+    let data = await getAllUsers();
+    return res.render("displayCRUD.ejs", { listUsers: data.data });
   } catch (error) {
-    console.error("Error retrieving users:", error);
-    return res.status(500).send("Not Found user");
+    console.error(error)
+    next(error)
   }
 };
-
-const getAllUsers = async (req, res, next) => {
-  try {
-    let [results, fields] = await connection
-      .promise()
-      .query(`SELECT * FROM Users`);
-    let users = results;
-    return res.status(200).json({
-      EC: 0,
-      EM: 'Get all users success!',
-      users,
-    });
-  } catch (error) {
-    console.error("Error retrieving users:", error);
-    return res.status(500).send("Not Found user");
-  }
-};
-
 
 const createNewUser = async (req, res, next) => {
-  let { firstName, lastName, email, password, phonenumber, gender, roleId } =
+  const { firstName, lastName, email, password, phonenumber, gender, roleId } =
     req.body;
+  const userData = { email, password, firstName, lastName, phonenumber, gender, roleId }
   try {
-    await connection
-      .promise()
-      .execute(
-        `INSERT INTO Users (firstName, lastName, email, password,  phonenumber, gender, roleId, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
-        [firstName, lastName, email, password, phonenumber, gender, roleId]
-      );
+    let newUser = await createUser(userData);
     return res.status(201).json({
-      EC: 0,
-      EM: 'Create a new user success!',
+      EC: newUser.EC,
+      EM: newUser.EM,
     });
   } catch (error) {
-    console.error("Error creating new user:", error);
-    return res.status(500).send("Internal Server Error");
+    console.error(error);
+    next(error)
   }
 };
 
@@ -54,16 +34,17 @@ const registerUser = async (req, res, next) => {
   return res.render("createCrud.ejs");
 };
 
+const login = async (req, res, next) => {
+  return res.render("loginUser.ejs");
+};
+
+
+
 const getEditUser = async (req, res, next) => {
   let userId = req.params.id;
   try {
-    const [results, fields] = await connection
-      .promise()
-      .execute(
-        `SELECT * FROM Users WHERE id = ?`,
-        [userId]
-      );
-    return res.render("editCRUD.ejs", { updateUser: results });
+    const userEdit = await getDataUser(userId);
+    return res.render("editCRUD.ejs", { updateUser: [userEdit.data] });
   } catch (error) {
     console.error("Error retrieving user:", error);
     return res.status(500).send("Internal Server Error");
@@ -71,20 +52,13 @@ const getEditUser = async (req, res, next) => {
 };
 
 const updateUser = async (req, res, next) => {
-  let { firstName, lastName, phonenumber, id } = req.body;
+  const { firstName, lastName, phonenumber, id } = req.body;
   try {
-    const [results, fields] = await connection
-      .promise()
-      .execute(
-        `UPDATE Users
-      SET firstName = ?, lastName = ?, phonenumber = ?
-      
-      WHERE id = ? ;`,
-        [firstName, lastName, phonenumber, id]
-      );
+    const dataEditUser = { firstName, lastName, phonenumber, id }
+    const userUpdate = await updateDataUser(dataEditUser);
     return res.status(201).json({
-      EC: 0,
-      EM: 'Update user success!',
+      EC: userUpdate.EC,
+      EM: userUpdate.EM,
     });
   } catch (error) {
     console.error("Error Update user:", error);
@@ -95,14 +69,10 @@ const updateUser = async (req, res, next) => {
 const deleteUser = async (req, res, next) => {
   let userId = req.params.id;
   try {
-    await connection
-      .promise()
-      .execute(
-        `DELETE FROM Users WHERE id = ${userId} ;`,
-      );
+    const deleteUser = await deleteDataUser(userId);
     return res.status(201).json({
-      EC: 0,
-      EM: 'Delete user success!',
+      EC: deleteUser.EC,
+      EM: deleteUser.EM,
     });
   } catch (error) {
     console.error("Error Delete user:", error);
@@ -110,13 +80,12 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
-
 module.exports = {
-  getAllUsers,
   createNewUser,
   registerUser,
   homePage,
   getEditUser,
   updateUser,
   deleteUser,
+  login,
 };

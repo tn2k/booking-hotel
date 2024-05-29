@@ -1,13 +1,13 @@
 const Joi = require('joi');
 
-const userValidate = data => {
+const userValidate = (data) => {
     const userSchema = Joi.object({
-        email: Joi.string().pattern(new RegExp('gmail.com$')).email().lowercase().require(),
-        password: Joi.string().min(4).max(32).require()
+        email: Joi.string().pattern(new RegExp('gmail.com$')).email().lowercase().required(),
+        password: Joi.string().min(4).max(32).required()
     })
-    return userSchema.validate(date)
+    return userSchema.validate(data)
 }
 
-module.exports {
+module.exports = {
     userValidate
 }

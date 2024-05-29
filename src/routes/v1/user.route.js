@@ -1,12 +1,11 @@
 const express = require('express')
 const routes = express.Router()
 
-const { getAllUsers, homePage, createNewUser, getEditUser, updateUser, deleteUser, registerUser, } = require('../../controllers/homeController')
-const { regisUser, verifyOtp, refreshToken, login, logout } = require('../../controllers/UserController')
+const { homePage, createNewUser, getEditUser, updateUser, deleteUser, registerUser, login } = require('../../controllers/homeController')
+const { regisUser, verifyOtp, refreshToken, logOut, ApiLogin } = require('../../controllers/UserController')
+const { verifyAccessToken } = require('../../config/jwt_service')
 
-routes.get('/home', homePage)
-routes.get('/users', getAllUsers)
-
+routes.get('/home', verifyAccessToken, homePage)
 routes.get('/register', registerUser)
 routes.post('/user', createNewUser)
 routes.get('/edit-user/:id', getEditUser)
@@ -17,9 +16,12 @@ routes.get('/delete-user/:id', deleteUser)
 routes.post('/users/regisUser', regisUser)
 routes.post('/users/verifyOtp', verifyOtp)
 
+routes.post('/access-tokken', refreshToken)
 routes.post('/refresh-tokken', refreshToken)
-routes.post('/login', login)
-routes.post('/logout', logout)
+
+routes.get('/login', login)
+routes.post('/ApiLogin', ApiLogin)
+routes.post('/logout', logOut)
 // router.post('/api/login', userController.handleLogin);
 // router.get('/api/get-all-users', userController.handleGetAllUsers)
 // router.post('/api/create-new-user', userController.handleCreateNewUser)

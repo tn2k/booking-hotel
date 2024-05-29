@@ -1,12 +1,15 @@
 'user strict';
-
+const createError = require('http-errors')
+const { userValidate } = require("../config/validation")
+const db = require('../models/index');
+const { hashPassword, comparePassword } = require("../services/auth.service");
 const {
     regisUser,
     verifyOtp,
-    // refreshToken,
-    // login,
-    // logout
-} = require('../services/user.service')
+} = require('../services/user.service');
+const { signAccessToken, singRefreshToken } = require("../config/jwt_service")
+
+
 
 
 var that = module.exports = {
@@ -66,16 +69,38 @@ var that = module.exports = {
         }
     },
 
-    login: async (req, res, next) => {
+    ApiLogin: async (req, res, next) => {
         try {
-            console.log('login')
+            const { error } = userValidate(req.body);
+            if (error) {
+                throw createError(error.details[0].message)
+            }
+            const { email, password } = req.body
+            const user = await db.User.findOne({
+                where: {
+                    email: email
+                }
+            })
+            if (!user) {
+                throw createError.NotFound('User not registered')
+            }
+            const isValid = await comparePassword(password, user.password)
+            if (!isValid) {
+                throw createError.Unauthorized();
+            }
+            const accessToken = await signAccessToken(user.id)
+            const refreshToken = await singRefreshToken(user.id)
+            res.json({
+                accessToken,
+                refreshToken
+            })
         } catch (error) {
             console.error(error)
             next(error)
         }
     },
 
-    logout: async (req, res, next) => {
+    logOut: async (req, res, next) => {
         try {
             console.log('logout')
         } catch (error) {
@@ -83,7 +108,6 @@ var that = module.exports = {
             next(error)
         }
     }
-
 }
 
 

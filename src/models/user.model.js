@@ -13,13 +13,40 @@ module.exports = (sequelize, DataTypes) => {
   }
   User.init(
     {
-      email: DataTypes.STRING,
-      password: DataTypes.STRING,
-      firstName: DataTypes.STRING,
-      lastName: DataTypes.STRING,
-      phonenumber: DataTypes.STRING,
-      gender: DataTypes.ENUM,
-      roleId: DataTypes.ENUM,
+      email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          isEmail: true
+        }
+      },
+      password: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      firstName: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      lastName: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      phonenumber: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          isNumeric: true
+        }
+      },
+      gender: {
+        type: DataTypes.ENUM("Male", "Female", "Other"), // Xác định rõ các giá trị ENUM cho gender
+        allowNull: false
+      },
+      roleId: {
+        type: DataTypes.ENUM("Admin", "User", "Tenant"), // Xác định rõ các giá trị ENUM cho roleId
+        allowNull: false
+      }
     },
     {
       sequelize,
@@ -28,3 +55,4 @@ module.exports = (sequelize, DataTypes) => {
   );
   return User;
 };
+

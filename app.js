@@ -2,7 +2,7 @@
 const express = require("express");
 const configViewEngine = require("./src/config/viewEngine.js");
 const app = express();
-const webRouter = require("./src/routes/index.js");
+const webRouter = require("./src/routes/routes.js");
 const bodyParser = require("body-parser");
 const connection = require("./src/config/connectDB.js");
 const createError = require("http-errors")
@@ -29,14 +29,17 @@ app.use((req, res, next) => {
   next(createError.NotFound('This route does not exist.'))
 });
 
-app.use((error, req, res, next) => {
-  res.status(error.status || 500).send({
+app.use((err, req, res, next) => {
+  res.status(err.status || 500).send({
     error: {
-      status: error.status || 500,
-      message: error.message || 'Internal Server Error'
+      status: err.status || 500,
+      message: err.message || 'Internal Server Error'
     },
   });
 });
+
+
+
 
 module.exports = app;
 
