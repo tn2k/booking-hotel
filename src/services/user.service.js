@@ -97,9 +97,10 @@ const createUser = async (userData) => {
     try {
         const { name, password, email, phone, role } = userData;
         console.log('check data ', userData)
-        const user = await db.Userss.findOne({
+        const user = await db.Users.findOne({
             where: { email: email },
         })
+        console.log('check user ', user)
         if (user) {
             return {
                 EC: 103,
@@ -108,7 +109,7 @@ const createUser = async (userData) => {
         }
         else if (!user) {
             const hashedPassword = await hashPassword(password);
-            const newUser = await db.Userss.create({
+            const newUser = await db.Users.create({
                 name,
                 password: hashedPassword,
                 email,
