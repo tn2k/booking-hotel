@@ -1,10 +1,8 @@
 const createHttpError = require("http-errors");
-const connection = require("../config/connectDB");
 const { getAllUsers, createUser, getDataUser, updateDataUser, deleteDataUser } = require("../services/user.service");
 
 
 const homePage = async (req, res, next) => {
-  console.log('check data ', req.headers);
   try {
     let data = await getAllUsers();
     return res.render("displayCRUD.ejs", { listUsers: data.data });
@@ -15,9 +13,9 @@ const homePage = async (req, res, next) => {
 };
 
 const createNewUser = async (req, res, next) => {
-  const { firstName, lastName, email, password, phonenumber, gender, roleId } =
+  const { name, password, email, phone, role } =
     req.body;
-  const userData = { email, password, firstName, lastName, phonenumber, gender, roleId }
+  const userData = { name, password, email, phone, role }
   try {
     let newUser = await createUser(userData);
     return res.status(201).json({
@@ -52,9 +50,9 @@ const getEditUser = async (req, res, next) => {
 };
 
 const updateUser = async (req, res, next) => {
-  const { firstName, lastName, phonenumber, id } = req.body;
+  const { name, phone, role, id } = req.body;
   try {
-    const dataEditUser = { firstName, lastName, phonenumber, id }
+    const dataEditUser = { name, phone, role, id }
     const userUpdate = await updateDataUser(dataEditUser);
     return res.status(201).json({
       EC: userUpdate.EC,

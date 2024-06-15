@@ -1,7 +1,7 @@
 const express = require('express')
 const routes = express.Router()
 
-const { createBooking, getBookingDetails, updateBooking, cancelBooking, addReview } = require('../../controllers/bookingController')
+const { createBooking, getBookingDetails, updateBooking, cancelBooking, addReview } = require('../../controllers/booking.Controller')
 
 // Router để tạo đặt phòng mới
 routes.post('/bookings', createBooking);

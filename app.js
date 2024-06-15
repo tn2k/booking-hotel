@@ -2,13 +2,11 @@
 const express = require("express");
 const configViewEngine = require("./src/config/viewEngine.js");
 const app = express();
-const webRouter = require("./src/routes/routes.js");
+const webRouter = require("./src/routes/access/index.js");
 const bodyParser = require("body-parser");
-const connection = require("./src/config/connectDB.js");
 const createError = require("http-errors")
 const cors = require("cors");
 const { Model } = require("sequelize");
-
 configViewEngine(app);
 
 app.use(cors());
@@ -17,6 +15,10 @@ app.use(cors({
   origin: 'http://localhost:3000',
   methods: ['POST', 'GET', 'PATCH', 'DELETE', 'PUT']// Chỉ cho phép truy cập từ domain này
 }));
+const { connectdb } = require('./src/config/connectDB.js')
+connectdb();
+// const { countConnect } = require('./src/config/checkConnections.js')
+// countConnect();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -37,7 +39,6 @@ app.use((err, req, res, next) => {
     },
   });
 });
-
 
 
 

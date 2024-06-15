@@ -1,5 +1,8 @@
 const JWT = require("jsonwebtoken");
-const createError = require('http-errors')
+const createError = require('http-errors');
+const { resolve, reject } = require("promise");
+const { refreshToken } = require("../controllers/User.Controller");
+const client = require('../config/redisClient')
 
 const signAccessToken = async (userId) => {
     return new Promise((resolve, reject) => {
@@ -29,10 +32,33 @@ const verifyAccessToken = (req, res, next) => {
     const token = bearerToken[1];
     JWT.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
         if (err) {
-            return next(createError.Unauthorized);
+            if (err.name === 'JsonWebTokenError') {
+                return next(createError.Unauthorized())
+            }
+            return next(createError.Unauthorized(err.message));
         }
         req.payload = payload
         next();
+    })
+}
+
+const verifyRefreshToken = async (userId) => {
+    return new Promise((resolve, reject) => {
+        JWT.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, payload) => {
+            if (err) {
+                return reject(err)
+            }
+            client.get(payload.userId, (err, reply) => {
+                if (err) {
+                    return reject(createError.InternalServerError())
+                }
+                if (refreshToken === reply) {
+                    return resolve(payload);
+                }
+                return reject(createError.Unauthorized())
+            })
+            resolve(payload)
+        })
     })
 }
 
@@ -48,8 +74,12 @@ const singRefreshToken = async (userId) => {
         JWT.sign(payload, secret, options, (err, token) => {
             if (err) {
                 reject(err);
-            } else {
-                resolve(token);
+                client.set(useId.toString(), token, 'EX', 360 * 24 * 60 * 60, (err, reply) => {
+                    if (err) {
+                        return reject(createError.InternalServerError())
+                    }
+                    resolve(token);
+                })
             }
         });
     });
@@ -58,5 +88,7 @@ const singRefreshToken = async (userId) => {
 
 module.exports = {
     signAccessToken,
-    verifyAccessToken, singRefreshToken
+    verifyAccessToken,
+    singRefreshToken,
+    verifyRefreshToken
 };

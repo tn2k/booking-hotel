@@ -1,11 +1,11 @@
 const express = require('express')
 const routes = express.Router()
 
-const { homePage, createNewUser, getEditUser, updateUser, deleteUser, registerUser, login } = require('../../controllers/homeController')
-const { regisUser, verifyOtp, refreshToken, logOut, ApiLogin } = require('../../controllers/UserController')
+const { homePage, createNewUser, getEditUser, updateUser, deleteUser, registerUser, login } = require('../../controllers/home.Controller')
+const { regisUser, verifyOtp, refreshToken, logOut, ApiLogin } = require('../../controllers/User.Controller')
 const { verifyAccessToken } = require('../../config/jwt_service')
 
-routes.get('/home', verifyAccessToken, homePage)
+routes.get('/home', homePage)
 routes.get('/register', registerUser)
 routes.post('/user', createNewUser)
 routes.get('/edit-user/:id', getEditUser)

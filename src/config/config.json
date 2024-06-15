@@ -3,8 +3,23 @@
     "username": "root",
     "password": "123456",
     "database": "tndev",
-    "host": "localhost",
+    "host": "127.0.0.1",
     "port": 3307,
     "dialect": "mysql"
+  },
+  "test": {
+    "username": "your_username",
+    "password": "your_password",
+    "database": "your_database_name_test",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "your_username",
+    "password": "your_password",
+    "database": "your_database_name",
+    "host": "127.0.0.1",
+    "dialect": "postgres",
+    "use_env_variable": "DATABASE_URL"
   }
 }

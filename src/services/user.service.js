@@ -5,8 +5,6 @@ const hash = require('bcrypt');
 const OtpGenerator = require('otp-generator')
 const { Op } = require('sequelize');
 const _Otp = require('../models/otp.model')
-const User = require('../models/user.model');
-const bcrypt = require('bcrypt');
 const { hashPassword } = require('../services/auth.service');
 
 const {
@@ -52,9 +50,9 @@ const verifyOtp = async ({
 }
 
 const regisUser = async ({ email }) => {
-    const user = await db.User.findOne({
+    const user = await db.Users.findOne({
         where: { email: email }
-    });
+    }).lean()
     if (user) {
         return {
             code: 400,
@@ -62,18 +60,16 @@ const regisUser = async ({ email }) => {
         }
     }
     // await deleteExpiredOtps();
-
     const OTP = OtpGenerator.generate(6, {
         digits: true,
         lowerCaseAlphabets: false,
         upperCaseAlphabets: false,
         specialChars: false,
     })
-
     console.log('OTP is : ', OTP)
     return {
         code: 200,
-        element: await interOtp({
+        element: await verifyOtp({
             email,
             otp: OTP
         })
@@ -83,7 +79,7 @@ const regisUser = async ({ email }) => {
 
 const getAllUsers = async () => {
     try {
-        const user = await db.User.findAll({
+        const user = await db.Users.findAll({
             raw: true,
         })
         return {
@@ -99,8 +95,9 @@ const getAllUsers = async () => {
 
 const createUser = async (userData) => {
     try {
-        const { email, password, firstName, lastName, phonenumber, gender, roleId } = userData;
-        const user = await db.User.findOne({
+        const { name, password, email, phone, role } = userData;
+        console.log('check data ', userData)
+        const user = await db.Userss.findOne({
             where: { email: email },
         })
         if (user) {
@@ -111,14 +108,14 @@ const createUser = async (userData) => {
         }
         else if (!user) {
             const hashedPassword = await hashPassword(password);
-            const newUser = await db.User.create({
-                email,
+            const newUser = await db.Userss.create({
+                name,
                 password: hashedPassword,
-                firstName,
-                lastName,
-                phonenumber,
-                gender,
-                roleId,
+                email,
+                phone,
+                role,
+                status: 'inactive',
+                verify: true,
             });
             return {
                 EC: 0,
@@ -136,7 +133,7 @@ const createUser = async (userData) => {
 }
 
 const getDataUser = async (userId) => {
-    const user = await db.User.findOne({
+    const user = await db.Users.findOne({
         where: { id: userId },
         raw: true,
     });
@@ -146,7 +143,6 @@ const getDataUser = async (userId) => {
             EM: 'this user is not exists!'
         }
     }
-
     return {
         EC: 0,
         EM: 'Get data User edit success!',
@@ -156,14 +152,14 @@ const getDataUser = async (userId) => {
 
 const updateDataUser = async (dataEditUser) => {
     try {
-        const user = await db.User.findByPk(dataEditUser.id);
+        const user = await db.Users.findByPk(dataEditUser.id);
         if (!user) {
             return {
                 EC: 404,
                 EM: 'User not found',
             };
         }
-        await db.User.update(dataEditUser, {
+        await db.Users.update(dataEditUser, {
             where: { id: dataEditUser.id }
         });
         return {
@@ -178,14 +174,14 @@ const updateDataUser = async (dataEditUser) => {
 
 const deleteDataUser = async (userId) => {
     try {
-        const user = await db.User.findByPk(userId);
+        const user = await db.Users.findByPk(userId);
         if (!user) {
             return {
                 EC: 404,
                 EM: 'User not found',
             };
         }
-        await db.User.destroy({
+        await db.Users.destroy({
             where: { id: userId }
         });
         return {
@@ -197,9 +193,6 @@ const deleteDataUser = async (userId) => {
         next(error)
     }
 }
-
-
-
 
 // async function deleteExpiredOtps() {
 //     const expirationTime = 60 * 1000; // 60 giây

@@ -7,13 +7,11 @@ const {
     regisUser,
     verifyOtp,
 } = require('../services/user.service');
-const { signAccessToken, singRefreshToken } = require("../config/jwt_service")
+const { signAccessToken, singRefreshToken, verifyRefreshToken } = require("../config/jwt_service")
 
 
-
-
-var that = module.exports = {
-    verifyOtp: async (req, res, next) => {
+class UserController {
+    verifyOtp = async (req, res, next) => {
         try {
             const {
                 email,
@@ -36,8 +34,8 @@ var that = module.exports = {
         } catch (error) {
             next(error)
         }
-    },
-    regisUser: async (req, res, next) => {
+    }
+    regisUser = async (req, res, next) => {
         try {
             const {
                 email
@@ -58,18 +56,27 @@ var that = module.exports = {
             console.error(error)
             next(error)
         }
-
-    },
-    refreshToken: async (req, res, next) => {
+    }
+    refreshToken = async (req, res, next) => {
         try {
-            console.log('refreshToken')
+            console.log('req.body')
+            const { refreshToken } = req.body;
+            if (!refreshToken) throw createError.BadRequest();
+            const payload = await verifyRefreshToken(refreshToken);
+            const accessToken = await signAccessToken(userId);
+            const refToken = await signAccessToken(userId);
+            console.log(`payload :: ${payload}`)
+            res.json({
+                accessToken,
+                refreshToken: refToken
+            })
         } catch (error) {
             console.error(error)
             next(error)
         }
-    },
+    }
 
-    ApiLogin: async (req, res, next) => {
+    ApiLogin = async (req, res, next) => {
         try {
             const { error } = userValidate(req.body);
             if (error) {
@@ -98,9 +105,9 @@ var that = module.exports = {
             console.error(error)
             next(error)
         }
-    },
+    }
 
-    logOut: async (req, res, next) => {
+    logOut = async (req, res, next) => {
         try {
             console.log('logout')
         } catch (error) {
@@ -109,5 +116,6 @@ var that = module.exports = {
         }
     }
 }
+module.exports = new UserController();
 
 

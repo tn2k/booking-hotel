@@ -60,7 +60,7 @@
   </style>
   <body>
     <h2>Bảng Đẹp</h2>
-    <a href="/v1/register"><button>Create new User</button></a>
+    <a href="/v1/api/register"><button>Create new User</button></a>
     <table action="/" method="get">
       <tr>
         <th>Id</th>
@@ -84,10 +84,10 @@
         <td><%= User.gender %></td>
         <td><%= User.roleId %></td>
         <td>
-          <a href="/v1/edit-user/<%= User.id %>"
+          <a href="/v1/api/edit-user/<%= User.id %>"
             ><i class="fa-regular fa-pen-to-square"></i
           ></a>
-          <a href="/v1/delete-user/<%= User.id %>"
+          <a href="/v1/api/delete-user/<%= User.id %>"
             ><i class="fa-solid fa-trash"></i
           ></a>
         </td>

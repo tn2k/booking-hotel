@@ -1,49 +1,58 @@
-"use strict";
-/** @type {import('sequelize-cli').Migration} */
+'use strict';
+
 module.exports = {
-  async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("Users", {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.createTable('Users', {
+      tenant_id: {
         type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
       },
-      email: {
+      // user_id: {
+      //   type: Sequelize.INTEGER,
+      // },
+      name: {
         type: Sequelize.STRING,
-        unique: true
+        allowNull: false
       },
       password: {
         type: Sequelize.STRING,
+        allowNull: false
       },
-      firstName: {
+      email: {
         type: Sequelize.STRING,
+        allowNull: false,
+        unique: true
       },
-      lastName: {
-        type: Sequelize.STRING,
-      },
-      phonenumber: {
+      phone: {
         type: Sequelize.BIGINT,
+        allowNull: false,
+        unique: true
       },
-      gender: {
-        type: Sequelize.ENUM,
-        values: ["Male", "Female", "Other"],
+      role: {
+        type: Sequelize.ENUM('landlord', 'tenant', 'admin'),
+        defaultValue: 'tenant'
       },
-      roleId: {
-        type: Sequelize.ENUM,
-        values: ["Admin", "User", "Tenant"],
+      status: {
+        type: Sequelize.ENUM('active', 'inactive'),
+        defaultValue: 'inactive'
+      },
+      verify: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: Sequelize.DATE
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE,
-      },
+        type: Sequelize.DATE
+      }
     });
   },
-  async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("Users");
-  },
+  // timestamps: true,
+  down: async (queryInterface, Sequelize) => {
+    await queryInterface.dropTable('Users');
+  }
 };
