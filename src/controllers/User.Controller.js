@@ -7,7 +7,8 @@ const {
     regisUser,
     verifyOtp,
 } = require('../services/user.service');
-const { signAccessToken, singRefreshToken, verifyRefreshToken } = require("../config/jwt_service")
+const { signAccessToken, singRefreshToken, verifyRefreshToken } = require("../auth/jwt_service");
+const client = require('../config/redisClient');
 
 
 class UserController {
@@ -59,13 +60,14 @@ class UserController {
     }
     refreshToken = async (req, res, next) => {
         try {
-            console.log('req.body')
             const { refreshToken } = req.body;
             if (!refreshToken) throw createError.BadRequest();
             const payload = await verifyRefreshToken(refreshToken);
-            const accessToken = await signAccessToken(userId);
-            const refToken = await signAccessToken(userId);
-            console.log(`payload :: ${payload}`)
+            console.log('check data  payload   :', payload)
+            const accessToken = await signAccessToken(payload.tenant_id);
+            console.log('check data   accessToken  :', accessToken)
+            const refToken = await singRefreshToken(payload.tenant_id);
+            console.log('check data     refToken:', refToken)
             res.json({
                 accessToken,
                 refreshToken: refToken
@@ -83,7 +85,7 @@ class UserController {
                 throw createError(error.details[0].message)
             }
             const { email, password } = req.body
-            const user = await db.User.findOne({
+            const user = await db.Users.findOne({
                 where: {
                     email: email
                 }
@@ -95,8 +97,8 @@ class UserController {
             if (!isValid) {
                 throw createError.Unauthorized();
             }
-            const accessToken = await signAccessToken(user.id)
-            const refreshToken = await singRefreshToken(user.id)
+            const accessToken = await signAccessToken(user.tenant_id);
+            const refreshToken = await singRefreshToken(user.tenant_id);
             res.json({
                 accessToken,
                 refreshToken
@@ -109,7 +111,19 @@ class UserController {
 
     logOut = async (req, res, next) => {
         try {
-            console.log('logout')
+            const { refreshToken } = req.body
+            if (!refreshToken) {
+                throw createError.BadRequest();
+            }
+            const { tenant_id } = await verifyRefreshToken(refreshToken)
+            client.del(tenant_id.toString(), (err, reply) => {
+                if (err) {
+                    throw createError.InternalServerError();
+                }
+                res.json({
+                    message: "logout"
+                })
+            })
         } catch (error) {
             console.error(error)
             next(error)

@@ -1,0 +1,31 @@
+###
+POST http://localhost:8081/v1/api/ApiLogin
+Content-Type:  application/json
+
+{
+    "email" :"tanconganh444@gmail.com",
+    "password" : "123321"
+}
+
+###
+POST http://localhost:8081/v1/api/refresh-tokken
+Content-Type: application/json
+
+{
+    "refreshToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRfaWQiOjIsImlhdCI6MTcxODc2OTg3MSwiZXhwIjoxNzUwMzI3NDcxfQ.Ic0tI2jBZz_I4E38j95eL9J62TsdH0frROxN0Xy3R-0"
+}
+
+###
+GET http://localhost:8081/v1/api/home
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRfaWQiOjIsImlhdCI6MTcxODc3MTI5MCwiZXhwIjoxNzE4NzcxMzUwfQ.fm69z8k0obZc4QxBPeEfCuDUymKwND4Mc-goKYl8Xus
+
+###
+POST http://localhost:8081/v1/api/logout
+Content-Type: application/json
+
+{
+    "refreshToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRfaWQiOjIsImlhdCI6MTcxODc4OTg2NCwiZXhwIjoxNzUwMzQ3NDY0fQ.mONAuKuHTfw5g4ymWDaUjQIa5UqbJ3HRtR9AOIfWf3U"
+}
+
+
+###

@@ -4,33 +4,44 @@ const configViewEngine = require("./src/config/viewEngine.js");
 const app = express();
 const webRouter = require("./src/routes/access/index.js");
 const bodyParser = require("body-parser");
-const createError = require("http-errors")
+const createError = require("http-errors");
+const morgan = require("morgan");
+const helmet = require("helmet");
+const compression = require('compression')
 const cors = require("cors");
 const { Model } = require("sequelize");
 configViewEngine(app);
 
+//init middlewares
+app.use(morgan('dev'))
+app.use(helmet())
+app.use(compression())
+app.use(express.json())
+app.use(express.urlencoded({
+  extended: true
+}))
 app.use(cors());
-
 app.use(cors({
   origin: 'http://localhost:3000',
   methods: ['POST', 'GET', 'PATCH', 'DELETE', 'PUT']// Chỉ cho phép truy cập từ domain này
 }));
-const { connectdb } = require('./src/config/connectDB.js')
+
+// init db
+const { connectdb } = require('./src/config/connectDB.js');
 connectdb();
-// const { countConnect } = require('./src/config/checkConnections.js')
-// countConnect();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// init routes
 app.use("/", webRouter);
 
+// Not foud route
 app.use((req, res, next) => {
-  // const error = new Error("Not found")
-  // error.status = 404;
-  // next(error);
   next(createError.NotFound('This route does not exist.'))
 });
 
+// handling error
 app.use((err, req, res, next) => {
   res.status(err.status || 500).send({
     error: {
@@ -39,8 +50,6 @@ app.use((err, req, res, next) => {
     },
   });
 });
-
-
 
 module.exports = app;
 

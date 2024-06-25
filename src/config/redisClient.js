@@ -4,7 +4,8 @@ let client;
 (async () => {
     client = redis.createClient({
         port: 6379,
-        host: "localhost"
+        host: "localhost",
+        legacyMode: true
     })
     client.on('connect', () => {
         console.log('Connected to Redis');

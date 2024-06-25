@@ -6,11 +6,15 @@ const OtpGenerator = require('otp-generator')
 const { Op } = require('sequelize');
 const _Otp = require('../models/otp.model')
 const { hashPassword } = require('../services/auth.service');
+const forge = require('node-forge');
+const { createTokenPair } = require('../auth/jwt_service')
+const { createKeyToken } = require('./keyToken.service')
 
 const {
     insertOtp,
     validOtp
-} = require('./opt.service')
+} = require('./opt.service');
+const { format } = require('morgan');
 
 
 const verifyOtp = async ({
@@ -96,11 +100,9 @@ const getAllUsers = async () => {
 const createUser = async (userData) => {
     try {
         const { name, password, email, phone, role } = userData;
-        console.log('check data ', userData)
         const user = await db.Users.findOne({
             where: { email: email },
         })
-        console.log('check user ', user)
         if (user) {
             return {
                 EC: 103,
@@ -118,11 +120,37 @@ const createUser = async (userData) => {
                 status: 'inactive',
                 verify: true,
             });
-            return {
-                EC: 0,
-                EM: 'Create user success!',
-                data: newUser,
-            };
+            if (newUser) {
+                const keypair = forge.pki.rsa.generateKeyPair(2048);
+
+                privatekey = forge.pki.privateKeyToPem(keypair.privateKey);
+                publickey = forge.pki.publicKeyToPem(keypair.publicKey);
+
+                const publickeyString = await createKeyToken({
+                    userId: newUser.tenant_id,
+                    publickey,
+                })
+                if (!publickeyString) {
+                    return {
+                        code: 'xxxx',
+                        message: 'publickeyString error'
+                    }
+                }
+
+                const tokens = await createTokenPair({ userId: newUser.tenant_id, email }, publickeyString, privatekey)
+
+                console.log("check data token :", tokens)
+
+                return {
+                    EC: 0,
+                    EM: 'Create user success!',
+                    data: {
+                        user: newUser,
+                        tokens
+                    },
+                };
+
+            }
         }
     } catch (error) {
         console.error('Error creating user:', error);
