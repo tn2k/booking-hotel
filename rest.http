@@ -1,10 +1,14 @@
 ###
-POST http://localhost:8081/v1/api/ApiLogin
+POST http://localhost:8081/v1/api/createNewUser
 Content-Type:  application/json
+# x-api-key : f8db3f5f7e925f335b592f30a4b224811d30f5a623d1a430e11cb3d166215da3
 
 {
-    "email" :"tanconganh444@gmail.com",
-    "password" : "123321"
+    "name" : "tnnn",
+    "password" :"1233219",
+    "email" :"8881214637@gmail.com",
+    "phone" : "841155441884",
+    "role" : "tenant"
 }
 
 ###

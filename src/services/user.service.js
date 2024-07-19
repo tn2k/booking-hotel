@@ -9,12 +9,16 @@ const { hashPassword } = require('../services/auth.service');
 const forge = require('node-forge');
 const { createTokenPair } = require('../auth/jwt_service')
 const { createKeyToken } = require('./keyToken.service')
+const { BadRequestError } = require("../core/error.response")
+const { SuccessResponse } = require("../core/success.response")
+const keytokenModel = require('../models/keytoken.model');
 
 const {
     insertOtp,
     validOtp
 } = require('./opt.service');
 const { format } = require('morgan');
+
 
 
 const verifyOtp = async ({
@@ -97,19 +101,15 @@ const getAllUsers = async () => {
     }
 }
 
-const createUser = async (userData) => {
+const createUser = async ({ name, password, email, phone, role }) => {
     try {
-        const { name, password, email, phone, role } = userData;
         const user = await db.Users.findOne({
             where: { email: email },
         })
         if (user) {
-            return {
-                EC: 103,
-                EM: 'this email is already exists!'
-            }
+            throw new BadRequestError("Error :this email is already exists!")
         }
-        else if (!user) {
+        else {
             const hashedPassword = await hashPassword(password);
             const newUser = await db.Users.create({
                 name,
@@ -123,42 +123,42 @@ const createUser = async (userData) => {
             if (newUser) {
                 const keypair = forge.pki.rsa.generateKeyPair(2048);
 
-                privatekey = forge.pki.privateKeyToPem(keypair.privateKey);
-                publickey = forge.pki.publicKeyToPem(keypair.publicKey);
+                const privatekey = forge.pki.privateKeyToPem(keypair.privateKey);
+                const publickey = forge.pki.publicKeyToPem(keypair.publicKey);
 
-                const publickeyString = await createKeyToken({
+                const tokens = await createTokenPair({ userId: newUser.tenant_id, email }, publickey, privatekey)
+
+                await createKeyToken({
                     userId: newUser.tenant_id,
-                    publickey,
+                    publickey: publickey,
+                    privatekey: privatekey,
+                    refreshToken: tokens.refreshToken
                 })
-                if (!publickeyString) {
-                    return {
-                        code: 'xxxx',
-                        message: 'publickeyString error'
-                    }
-                }
-
-                const tokens = await createTokenPair({ userId: newUser.tenant_id, email }, publickeyString, privatekey)
-
-                console.log("check data token :", tokens)
-
-                return {
-                    EC: 0,
-                    EM: 'Create user success!',
-                    data: {
-                        user: newUser,
-                        tokens
+                return new SuccessResponse({
+                    metadata: {
+                        User: newUser,
+                        tokens,
                     },
-                };
-
+                });
             }
         }
     } catch (error) {
-        console.error('Error creating user:', error);
-        return {
-            EC: 301,
-            EM: 'Create user failed!',
-        };
+        console.error(error);
+        throw new Error('Registration failed');
     }
+
+    // return new SuccessResponse({
+    //     metadata: {
+    //         User: newUser,
+    //         tokens,
+    //     },
+    //             // })
+    //         }
+    //     }
+    // } catch (error) {
+    //     throw new BadRequestError("Create user failed!");
+    // }
+
 }
 
 const getDataUser = async (userId) => {
@@ -168,14 +168,14 @@ const getDataUser = async (userId) => {
     });
     if (!user) {
         return {
-            EC: 400,
-            EM: 'this user is not exists!'
+            StatusCode: 400,
+            message: 'this user is not exists!'
         }
     }
     return {
-        EC: 0,
-        EM: 'Get data User edit success!',
-        data: user
+        StatusCode: 0,
+        message: 'Get data User edit success!',
+        metadata: user
     }
 }
 
@@ -184,16 +184,16 @@ const updateDataUser = async (dataEditUser) => {
         const user = await db.Users.findByPk(dataEditUser.id);
         if (!user) {
             return {
-                EC: 404,
-                EM: 'User not found',
+                StatusCode: 404,
+                message: 'User not found',
             };
         }
         await db.Users.update(dataEditUser, {
             where: { id: dataEditUser.id }
         });
         return {
-            EC: 0,
-            EM: 'Update user success',
+            StatusCode: 0,
+            message: 'Update user success',
         };
     } catch (error) {
         console.error('Error updating user:', error);
@@ -206,21 +206,33 @@ const deleteDataUser = async (userId) => {
         const user = await db.Users.findByPk(userId);
         if (!user) {
             return {
-                EC: 404,
-                EM: 'User not found',
+                StatusCode: 404,
+                message: 'User not found',
             };
         }
         await db.Users.destroy({
             where: { id: userId }
         });
         return {
-            EC: 0,
-            EM: 'Delete user success',
+            StatusCode: 0,
+            message: 'Delete user success',
         };
     } catch (error) {
         console.error('Error delete user:', error);
         next(error)
     }
+}
+
+const findByEmail = async ({
+    email, select = {
+        email: 1, password: 2, name: 1, status: 1, phone: 1, role: 1, status: 1, verify: 1
+    }
+}) => {
+    return await UserActivation.findOne({ email }).select(select).lean()
+}
+
+const removeKeyById = async (id) => {
+    return await keytokenModel.remove(id)
 }
 
 // async function deleteExpiredOtps() {
@@ -242,11 +254,13 @@ const deleteDataUser = async (userId) => {
 // }
 
 module.exports = {
-    verifyOtp: verifyOtp,
-    regisUser: regisUser,
-    getAllUsers: getAllUsers,
-    createUser: createUser,
-    getDataUser: getDataUser,
-    updateDataUser: updateDataUser,
-    deleteDataUser: deleteDataUser
+    verifyOtp,
+    regisUser,
+    getAllUsers,
+    createUser,
+    getDataUser,
+    updateDataUser,
+    deleteDataUser,
+    findByEmail,
+    removeKeyById
 }

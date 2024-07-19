@@ -2,7 +2,7 @@
 const express = require("express");
 const configViewEngine = require("./src/config/viewEngine.js");
 const app = express();
-const webRouter = require("./src/routes/access/index.js");
+const webRouter = require("./src/routes/index.js");
 const bodyParser = require("body-parser");
 const createError = require("http-errors");
 const morgan = require("morgan");
@@ -38,16 +38,18 @@ app.use("/", webRouter);
 
 // Not foud route
 app.use((req, res, next) => {
-  next(createError.NotFound('This route does not exist.'))
+  const error = new error("Not Found")
+  error.status = 404,
+    next(error)
 });
 
 // handling error
-app.use((err, req, res, next) => {
-  res.status(err.status || 500).send({
-    error: {
-      status: err.status || 500,
-      message: err.message || 'Internal Server Error'
-    },
+app.use((error, req, res, next) => {
+  const statusCode = error.status || 500
+  return res.status(statusCode).json({
+    status: "error",
+    code: statusCode,
+    message: error.message || 'Internal Server Error',
   });
 });
 

@@ -1,13 +1,14 @@
 const express = require('express')
 const routes = express.Router()
 
-const { homePage, createNewUser, getEditUser, updateUser, deleteUser, registerUser, login } = require('../../controllers/home.Controller')
-const { regisUser, verifyOtp, refreshToken, logOut, ApiLogin } = require('../../controllers/User.Controller')
-const { verifyAccessToken } = require('../../auth/jwt_service')
+const { homePage, createNewUser, getEditUser, updateUser, deleteUser, registerUser, login, logOut, loginDisplay } = require('../../controllers/home.Controller')
+const { regisUser, verifyOtp, refreshToken } = require('../../controllers/User.Controller')
+const { verifyAccessToken, authorization, } = require('../../auth/jwt_service')
+const { asyncHandler } = require("../../helpers/asyncHandler")
 
 routes.get('/home', verifyAccessToken, homePage)
 routes.get('/register', registerUser)
-routes.post('/user', createNewUser)
+routes.post('/createNewUser', asyncHandler(createNewUser))
 routes.get('/edit-user/:id', getEditUser)
 routes.post('/patch-user', updateUser)
 routes.get('/delete-user/:id', deleteUser)
@@ -19,9 +20,11 @@ routes.post('/users/verifyOtp', verifyOtp)
 routes.post('/access-tokken', refreshToken)
 routes.post('/refresh-tokken', refreshToken)
 
-routes.get('/login', login)
-routes.post('/ApiLogin', ApiLogin)
-routes.post('/logout', logOut)
+routes.get('/loginDisplay', loginDisplay)
+routes.post('/login', login)
+
+routes.use(authorization)
+routes.post('/logout', asyncHandler(logOut))
 // router.post('/api/login', userController.handleLogin);
 // router.get('/api/get-all-users', userController.handleGetAllUsers)
 // router.post('/api/create-new-user', userController.handleCreateNewUser)
