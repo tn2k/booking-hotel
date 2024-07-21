@@ -15,10 +15,10 @@ const homePage = async (req, res, next) => {
 };
 
 
-const login = async (keyStore) => {
+const login = async (req, res, next) => {
   new SuccessResponse({
-    message: "Logout User success !",
-    metadata: await ApiLogin(req.keyStore)
+    message: "Logout User success!",
+    metadata: await ApiLogin(req.body)
   }).send(res)
 };
 

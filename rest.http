@@ -6,8 +6,8 @@ Content-Type:  application/json
 {
     "name" : "tnnn",
     "password" :"1233219",
-    "email" :"8881214637@gmail.com",
-    "phone" : "841155441884",
+    "email" :"8t12379@gmail.com",
+    "phone" : "1969976767684",
     "role" : "tenant"
 }
 
@@ -29,6 +29,17 @@ Content-Type: application/json
 
 {
     "refreshToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRfaWQiOjIsImlhdCI6MTcxODc4OTg2NCwiZXhwIjoxNzUwMzQ3NDY0fQ.mONAuKuHTfw5g4ymWDaUjQIa5UqbJ3HRtR9AOIfWf3U"
+}
+
+###
+POST http://localhost:8081/v1/api/login
+Content-Type: application/json
+
+
+{
+    "email" :"8t12379@gmail.com",
+   "password" :"1233219",
+    "refreshToken" :"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjU4LCJlbWFpbCI6Ijh0MTIzNzlAZ21haWwuY29tIiwiaWF0IjoxNzIxNDQzNjQyLCJleHAiOjE3MjIwNDg0NDJ9.AFKIV4Z2XPn4zTPgnNlmnt38qFgSfl4ntz1F1ce4vMjH40yXZIcpy9vRsoB-ArVQ6OwKoBSfTFohYrwS4x28LlMjWBX1LxEkHD9Ly_28fnASLry_pLIl_9ueWK_Oclw3sld0h8S8ObaUYHdft-UR8iQhub9RYATgTRmfDZOx6EW4rFbcUkVNTSql0kQWHmDh840BvGa9PXDRRIJIOgEYS81Znd5ltC0wkxH4tl22GAGvTf3Her-tOVJm7dEI_OsMZDlOblyiujrW3xonBIvRhy0fnlCfMHihn3ubfhnIUZGL-dvhS-HMoJJxYyurc2XDkyv1MDXvB506CWqAod9vVA"
 }
 
 

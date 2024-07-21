@@ -31,7 +31,8 @@ const createTokenPair = async (payload, publicKey, privateKey) => {
         })
         return { accessToken, refreshToken }
     } catch (error) {
-
+        console.error(error);
+        next(error)
     }
 }
 
@@ -66,47 +67,47 @@ const authorization = asyncHandler(async (req, res, next) => {
     }
 })
 
-const signAccessToken = async (userId, publicKey, privateKey) => {
-    return new Promise((resolve, reject) => {
-        const userId = {
-            tenant_id
-        };
-        console.log('check tenant_id :', userId)
-        const secret = publicKey // Nên sử dụng một biến môi trường cho key bí mật của bạn
-        const options = {
-            expiresIn: '60s'
-        };
-        JWT.sign(payload, secret, options, (err, token) => {
-            if (err) {
-                reject(err);
-            }
-            resolve(token);
-        });
-    });
-};
+// const signAccessToken = async (userId, publicKey, privateKey) => {
+//     return new Promise((resolve, reject) => {
+//         const userId = {
+//             tenant_id
+//         };
+//         console.log('check tenant_id :', userId)
+//         const secret = publicKey // Nên sử dụng một biến môi trường cho key bí mật của bạn
+//         const options = {
+//             expiresIn: '60s'
+//         };
+//         JWT.sign(payload, secret, options, (err, token) => {
+//             if (err) {
+//                 reject(err);
+//             }
+//             resolve(token);
+//         });
+//     });
+// };
 
 
 
-const singRefreshToken = async (tenant_id) => {
-    return new Promise((resolve, reject) => {
-        const payload = {
-            tenant_id
-        };
-        const secret = process.env.REFRESH_TOKEN_SECRET; // Nên sử dụng một biến môi trường cho key bí mật của bạn
-        const options = {
-            expiresIn: '1y' // 10m 10s
-        };
-        JWT.sign(payload, secret, options, (err, token) => {
-            if (err) reject(err);
-            client.set(tenant_id.toString(), token, { EX: 60 * 60 * 24 * 365 }, (err, reply) => {
-                if (err) {
-                    return reject(createError.InternalServerError())
-                }
-            })
-            resolve(token);
-        });
-    });
-}
+// const singRefreshToken = async (tenant_id) => {
+//     return new Promise((resolve, reject) => {
+//         const payload = {
+//             tenant_id
+//         };
+//         const secret = process.env.REFRESH_TOKEN_SECRET; // Nên sử dụng một biến môi trường cho key bí mật của bạn
+//         const options = {
+//             expiresIn: '1y' // 10m 10s
+//         };
+//         JWT.sign(payload, secret, options, (err, token) => {
+//             if (err) reject(err);
+//             client.set(tenant_id.toString(), token, { EX: 60 * 60 * 24 * 365 }, (err, reply) => {
+//                 if (err) {
+//                     return reject(createError.InternalServerError())
+//                 }
+//             })
+//             resolve(token);
+//         });
+//     });
+// }
 
 
 const verifyAccessToken = (req, res, next) => {
@@ -128,31 +129,31 @@ const verifyAccessToken = (req, res, next) => {
     })
 }
 
-const verifyRefreshToken = async (refreshToken) => {
-    return new Promise((resolve, reject) => {
-        JWT.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, payload) => {
-            if (err) {
-                return reject(err)
-            }
-            client.get(payload.tenant_id, (err, reply) => {
-                if (err) {
-                    return reject(createError.InternalServerError())
-                }
-                if (refreshToken === reply) {
-                    return resolve(payload);
-                }
-                return reject(createError.Unauthorized())
-            })
-            resolve(payload)
-        })
-    })
-}
+// const verifyRefreshToken = async (refreshToken) => {
+//     return new Promise((resolve, reject) => {
+//         JWT.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, payload) => {
+//             if (err) {
+//                 return reject(err)
+//             }
+//             client.get(payload.tenant_id, (err, reply) => {
+//                 if (err) {
+//                     return reject(createError.InternalServerError())
+//                 }
+//                 if (refreshToken === reply) {
+//                     return resolve(payload);
+//                 }
+//                 return reject(createError.Unauthorized())
+//             })
+//             resolve(payload)
+//         })
+//     })
+// }
 
 module.exports = {
     createTokenPair,
-    signAccessToken,
+    // signAccessToken,
     verifyAccessToken,
-    singRefreshToken,
-    verifyRefreshToken,
+    // singRefreshToken,
+    // verifyRefreshToken,
     authorization
 };

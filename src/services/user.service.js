@@ -21,7 +21,7 @@ const { format } = require('morgan');
 
 
 
-const verifyOtp = async ({
+const verifyotp = async ({
     email,
     otp
 }) => {
@@ -57,7 +57,7 @@ const verifyOtp = async ({
     }
 }
 
-const regisUser = async ({ email }) => {
+const regisuser = async ({ email }) => {
     const user = await db.Users.findOne({
         where: { email: email }
     }).lean()
@@ -146,19 +146,6 @@ const createUser = async ({ name, password, email, phone, role }) => {
         console.error(error);
         throw new Error('Registration failed');
     }
-
-    // return new SuccessResponse({
-    //     metadata: {
-    //         User: newUser,
-    //         tokens,
-    //     },
-    //             // })
-    //         }
-    //     }
-    // } catch (error) {
-    //     throw new BadRequestError("Create user failed!");
-    // }
-
 }
 
 const getDataUser = async (userId) => {
@@ -223,44 +210,18 @@ const deleteDataUser = async (userId) => {
     }
 }
 
-const findByEmail = async ({
-    email, select = {
-        email: 1, password: 2, name: 1, status: 1, phone: 1, role: 1, status: 1, verify: 1
-    }
-}) => {
-    return await UserActivation.findOne({ email }).select(select).lean()
-}
-
 const removeKeyById = async (id) => {
     return await keytokenModel.remove(id)
 }
 
-// async function deleteExpiredOtps() {
-//     const expirationTime = 60 * 1000; // 60 giây
-//     const expiredDate = new Date(new Date() - expirationTime);
-
-//     try {
-//         const result = await _Otp.destroy({
-//             where: {
-//                 time: {
-//                     [Op.lt]: expiredDate
-//                 }
-//             }
-//         });
-//         console.log(`Deleted ${result} expired OTPs.`);
-//     } catch (error) {
-//         console.error('Failed to delete expired OTPs:', error);
-//     }
-// }
-
 module.exports = {
-    verifyOtp,
-    regisUser,
+    verifyotp,
+    regisuser,
     getAllUsers,
     createUser,
     getDataUser,
     updateDataUser,
     deleteDataUser,
-    findByEmail,
-    removeKeyById
+    removeKeyById,
+
 }

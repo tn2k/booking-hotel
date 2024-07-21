@@ -21,7 +21,7 @@ routes.post('/access-tokken', refreshToken)
 routes.post('/refresh-tokken', refreshToken)
 
 routes.get('/loginDisplay', loginDisplay)
-routes.post('/login', login)
+routes.post('/login', asyncHandler(login))
 
 routes.use(authorization)
 routes.post('/logout', asyncHandler(logOut))
