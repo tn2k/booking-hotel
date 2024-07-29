@@ -2,39 +2,34 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Rooms', {
+    await queryInterface.createTable('Room', {
       room_id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: 'Product',
+          key: 'product_id'
+        }
       },
-      tenant_id: {
-        type: Sequelize.INTEGER,
+      room_description: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
-      address: {
-        type: Sequelize.STRING
+      room_detail: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
-      city: {
-        type: Sequelize.STRING
+      room_rules: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
-      state: {
-        type: Sequelize.STRING
+      rentail_conditions: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
-      zip_code: {
-        type: Sequelize.STRING
-      },
-      room_number: {
-        type: Sequelize.STRING
-      },
-      floor: {
-        type: Sequelize.INTEGER
-      },
-      rent: {
-        type: Sequelize.DECIMAL(10, 2)
-      },
-      status: {
-        type: Sequelize.ENUM('available', 'occupied'),
-        defaultValue: 'available'
+      terms_and_conditions: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,
@@ -48,6 +43,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Rooms');
+    await queryInterface.dropTable('Room');
   }
 };

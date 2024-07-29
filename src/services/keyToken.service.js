@@ -1,19 +1,11 @@
 const db = require('../models/index')
 const { filter, update } = require("lodash")
 const { refreshToken } = require("../controllers/User.Controller.js")
-const { DataTypes } = require("sequelize")
+const { fn, col, literal } = require('sequelize');
+
 class KeyTokenService {
     static createKeyToken = async ({ userId, publickey, privatekey, refreshToken }) => {
         try {
-            // const publicKeyString = publickey.toString();
-            // const token = await db.keytokenModels.create({
-            //     user: userId,
-            //     publicKey: publicKeyString,
-            //     refreshTokensUsed: [],
-            //     refreshToken
-            // })
-            // return token ? publicKeyString : null
-
             const update = {
                 user: userId,
                 privatekey,
@@ -30,7 +22,34 @@ class KeyTokenService {
     }
 
     static findByUserId = async (userId) => {
-        return await db.keytokenModels.findOne({ user: DataTypes.ObjectId(userId) }).lean()
+        return await db.keytokenModels.findOne({ where: { user: userId } })
+    }
+
+    static removeKeyById = async (id) => {
+        try {
+            console.log(" check id :", id)
+            const result = await db.keytokenModels.destroy({
+                where: { user: id }
+            });
+            return result;
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    static findByRefreshTokenUsed = async (refreshToken) => {
+        console.log("check data >> refreshToken ", refreshToken)
+        return await db.keytokenModels.findOne({
+            where: literal(`JSON_CONTAINS(refreshTokensUsed, '"${refreshToken}"')`)
+        })
+    }
+
+    static findByRefreshToken = async (refreshToken) => {
+        return await db.keytokenModels.findOne({ where: { refreshToken: refreshToken } })
+    }
+
+    static deleteKeyById = async (userId) => {
+        return await db.keytokenModels.destroy({ where: { user: userId } });
     }
 }
 module.exports = KeyTokenService 

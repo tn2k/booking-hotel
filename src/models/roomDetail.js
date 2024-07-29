@@ -13,7 +13,7 @@ module.exports = (sequelize) => {
         room_id: {
             type: DataTypes.INTEGER,
             references: {
-                model: 'Rooms',
+                model: 'Room',
                 key: 'room_id'
             }
         },

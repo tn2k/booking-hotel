@@ -9,10 +9,12 @@ const { findByUserId } = require("../services/keyToken.service");
 const HEADER = {
     API_KEY: 'x-api-key',
     CLIENT_DI: "x-client-id",
-    AUTHORIZATION: 'athorization'
+    AUTHORIZATION: 'athorization',
+    REFRESHTOKEN: " refreshtoken"
 }
 
-const createTokenPair = async (payload, publicKey, privateKey) => {
+const createTokenPair = async ({ payload, publicKey, privateKey }) => {
+    console.log("check data payload, publicKey, privateKey ", payload, publicKey, privateKey)
     try {
         const accessToken = await JWT.sign(payload, privateKey, {
             algorithm: 'RS256',
@@ -32,11 +34,11 @@ const createTokenPair = async (payload, publicKey, privateKey) => {
         return { accessToken, refreshToken }
     } catch (error) {
         console.error(error);
-        next(error)
+        throw (error)
     }
 }
 
-const authorization = asyncHandler(async (req, res, next) => {
+const authentication = asyncHandler(async (req, res, next) => {
     /*
         1 - Check userId missing ??? 
         2 - get accessToken 
@@ -47,19 +49,34 @@ const authorization = asyncHandler(async (req, res, next) => {
     */
     // 1 
     const userId = req.headers[HEADER.CLIENT_DI]
-    if (!userId) throw new AuthFailureError("Invalid Request")
+    if (!userId) throw new AuthFailureError("Invalid Request ")
 
     // 2 
     const keyStore = await findByUserId(userId)
     if (!keyStore) throw new NotFoundError("Not found KeyStore")
 
     // 3 
+    if (req.headers[HEADER.REFRESHTOKEN]) {
+        try {
+            const refreshToken = req.headers[HEADER.REFRESHTOKEN]
+            const decodeUser = JWT.verify(refreshToken, keyStore.privateKey)
+            if (userId !== decodeUser.userId.toString()) throw new AuthFailureError("Invalid Userid")
+            req.keyStore = keyStore
+            req.user = decodeUser
+            req.refreshToken = refreshToken
+            return next()
+        } catch (error) {
+            throw error
+        }
+    }
+
+
     const accessToken = req.headers[HEADER.AUTHORIZATION]
-    if (!accessToken) throw new AuthFailureError("Invalid Request")
+    if (!accessToken) throw new AuthFailureError("Invalid Request ")
 
     try {
-        const decodeUser = JWT.verify(accessToken, keyStore.publicKey)
-        if (userId !== decodeUser.tenant_id) throw new AuthFailureError("Invalid Userid")
+        const decodeUser = JWT.verify(accessToken, keyStore.publickey)
+        if (userId !== decodeUser.userId.toString()) throw new AuthFailureError("Invalid Userid")
         req.keyStore = keyStore
         return next()
     } catch (error) {
@@ -67,6 +84,9 @@ const authorization = asyncHandler(async (req, res, next) => {
     }
 })
 
+const verifyJWT = async (token, keySecret) => {
+    return await JWT.verify(token, keySecret);
+}
 // const signAccessToken = async (userId, publicKey, privateKey) => {
 //     return new Promise((resolve, reject) => {
 //         const userId = {
@@ -151,9 +171,10 @@ const verifyAccessToken = (req, res, next) => {
 
 module.exports = {
     createTokenPair,
-    // signAccessToken,
+    authentication,
+    verifyJWT,
     verifyAccessToken,
+    // signAccessToken,
     // singRefreshToken,
     // verifyRefreshToken,
-    authorization
 };

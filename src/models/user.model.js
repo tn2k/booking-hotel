@@ -7,16 +7,9 @@ module.exports = (sequelize, DataTypes) => {
   class Users extends Model { }
   Users.init({
     tenant_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
-      autoIncrement: true
-    },
-    user_id: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'Users',
-        key: 'user_id'
-      }
     },
     name: {
       type: DataTypes.STRING,

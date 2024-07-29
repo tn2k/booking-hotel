@@ -1,11 +1,5 @@
 const JWT = require("jsonwebtoken");
 
-const HEADER = {
-    API_KEY: 'x-api-key',
-    CLIENT_DI: "x-client-id",
-    AUTHORIZATION: 'athorization'
-}
-
 const createTokenPair = async (payload, publicKey, privateKey) => {
     try {
         const accessToken = await JWT.sign(payload, privateKey, {

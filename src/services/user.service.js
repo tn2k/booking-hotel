@@ -60,7 +60,7 @@ const verifyotp = async ({
 const regisuser = async ({ email }) => {
     const user = await db.Users.findOne({
         where: { email: email }
-    }).lean()
+    })
     if (user) {
         return {
             code: 400,
@@ -210,9 +210,7 @@ const deleteDataUser = async (userId) => {
     }
 }
 
-const removeKeyById = async (id) => {
-    return await keytokenModel.remove(id)
-}
+
 
 module.exports = {
     verifyotp,
@@ -222,6 +220,4 @@ module.exports = {
     getDataUser,
     updateDataUser,
     deleteDataUser,
-    removeKeyById,
-
 }

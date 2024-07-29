@@ -3,6 +3,7 @@ const { getAllUsers, createUser, getDataUser, updateDataUser, deleteDataUser } =
 const { OK, CREATED, SuccessResponse } = require("../core/success.response")
 const { ApiLogin, logout } = require("./User.Controller");
 const { create } = require("lodash");
+const { handlerRefreshToken } = require("../services/access.service")
 
 const homePage = async (req, res, next) => {
   try {
@@ -14,6 +15,16 @@ const homePage = async (req, res, next) => {
   }
 };
 
+const handlerRefreshToKen = async (req, res, next) => {
+  new SuccessResponse({
+    message: "Get token User success!",
+    metadata: await handlerRefreshToken({
+      refreshToken: req.refreshToken,
+      user: req.user,
+      keyStore: req.keyStore
+    })
+  }).send(res)
+};
 
 const login = async (req, res, next) => {
   new SuccessResponse({
@@ -103,5 +114,6 @@ module.exports = {
   deleteUser,
   loginDisplay,
   login,
-  logOut
+  logOut,
+  handlerRefreshToKen
 };

@@ -2,14 +2,14 @@
 const { DataTypes, Model } = require('sequelize');
 
 module.exports = (sequelize) => {
-    class Room extends Model { }
+    class House extends Model { }
 
-    Room.init({
+    House.init({
         room_id: {
             type: DataTypes.UUID,
             allowNull: false,
             references: {
-                model: 'ProductModels',
+                model: 'Product',
                 key: 'product_id'
             }
         },
@@ -35,8 +35,8 @@ module.exports = (sequelize) => {
         },
     }, {
         sequelize,
-        modelName: 'Room'
+        modelName: 'House'
     });
 
-    return Room;
+    return House;
 };
