@@ -6,9 +6,9 @@ module.exports = (sequelize) => {
 
     Payment.init({
         payment_id: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
             primaryKey: true,
-            autoIncrement: true
         },
         rental_id: {
             type: DataTypes.INTEGER,

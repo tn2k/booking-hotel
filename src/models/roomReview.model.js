@@ -6,9 +6,9 @@ module.exports = (sequelize) => {
 
     RoomReview.init({
         review_id: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
             primaryKey: true,
-            autoIncrement: true
         },
         room_id: DataTypes.INTEGER,
         user_id: DataTypes.INTEGER,
@@ -21,7 +21,7 @@ module.exports = (sequelize) => {
     });
 
     RoomReview.associate = (models) => {
-        RoomReview.belongsTo(models.Room, { foreignKey: 'room_id' });
+        RoomReview.belongsTo(models.Rooms, { foreignKey: 'room_id' });
         RoomReview.belongsTo(models.Users, { foreignKey: 'user_id' });
     };
 

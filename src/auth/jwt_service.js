@@ -1,8 +1,5 @@
 const JWT = require("jsonwebtoken");
 const createError = require('http-errors');
-const { resolve, reject } = require("promise");
-const { refreshToken } = require("../controllers/User.Controller");
-const client = require('../config/redisClient');
 const { AuthFailureError, NotFoundError } = require("../core/error.response");
 const { asyncHandler } = require("../helpers/asyncHandler");
 const { findByUserId } = require("../services/keyToken.service");
@@ -10,11 +7,10 @@ const HEADER = {
     API_KEY: 'x-api-key',
     CLIENT_DI: "x-client-id",
     AUTHORIZATION: 'athorization',
-    REFRESHTOKEN: " refreshtoken"
+    REFRESHTOKEN: 'x-rtoken-id'
 }
 
 const createTokenPair = async ({ payload, publicKey, privateKey }) => {
-    console.log("check data payload, publicKey, privateKey ", payload, publicKey, privateKey)
     try {
         const accessToken = await JWT.sign(payload, privateKey, {
             algorithm: 'RS256',
@@ -59,8 +55,8 @@ const authentication = asyncHandler(async (req, res, next) => {
     if (req.headers[HEADER.REFRESHTOKEN]) {
         try {
             const refreshToken = req.headers[HEADER.REFRESHTOKEN]
-            const decodeUser = JWT.verify(refreshToken, keyStore.privateKey)
-            if (userId !== decodeUser.userId.toString()) throw new AuthFailureError("Invalid Userid")
+            const decodeUser = JWT.verify(refreshToken, keyStore.privatekey)
+            if (userId !== decodeUser.userId) throw new AuthFailureError("Invalid Userid")
             req.keyStore = keyStore
             req.user = decodeUser
             req.refreshToken = refreshToken
@@ -69,7 +65,6 @@ const authentication = asyncHandler(async (req, res, next) => {
             throw error
         }
     }
-
 
     const accessToken = req.headers[HEADER.AUTHORIZATION]
     if (!accessToken) throw new AuthFailureError("Invalid Request ")

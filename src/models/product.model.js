@@ -2,13 +2,17 @@
 const { DataTypes, Model } = require('sequelize');
 
 module.exports = (sequelize) => {
-    class Product extends Model { }
+    class Products extends Model { }
 
-    Product.init({
+    Products.init({
         product_id: {
             type: DataTypes.UUID,
-            defaultValue: DataTypes.UUIDV4,
+            allowNull: false,
             primaryKey: true,
+        },
+        product_user: {
+            type: DataTypes.UUID,
+            allowNull: false,
         },
         product_name: {
             type: DataTypes.STRING,
@@ -44,8 +48,8 @@ module.exports = (sequelize) => {
         },
     }, {
         sequelize,
-        modelName: 'Product'
+        modelName: 'Products'
     });
 
-    return Product;
+    return Products;
 };

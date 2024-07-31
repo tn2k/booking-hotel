@@ -7,10 +7,14 @@ module.exports = (sequelize) => {
     Room.init({
         room_id: {
             type: DataTypes.UUID,
-            allowNull: false,
+            defaultValue: DataTypes.UUIDV4,
+            primaryKey: true,
+        },
+        product_user: {
+            type: DataTypes.UUID,
             references: {
-                model: 'ProductModels',
-                key: 'product_id'
+                model: 'Users',
+                key: 'tenant_id'
             }
         },
         room_description: {
@@ -35,7 +39,7 @@ module.exports = (sequelize) => {
         },
     }, {
         sequelize,
-        modelName: 'Room'
+        modelName: 'Rooms'
     });
 
     return Room;

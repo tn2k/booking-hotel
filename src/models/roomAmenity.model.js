@@ -6,9 +6,9 @@ module.exports = (sequelize) => {
 
     RoomAmenity.init({
         room_amenity_id: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
             primaryKey: true,
-            autoIncrement: true
         },
         room_id: {
             type: DataTypes.INTEGER,
@@ -24,7 +24,7 @@ module.exports = (sequelize) => {
     });
 
     RoomAmenity.associate = (models) => {
-        RoomAmenity.belongsTo(models.Room, { foreignKey: 'room_id' });
+        RoomAmenity.belongsTo(models.Rooms, { foreignKey: 'room_id' });
     };
 
     return RoomAmenity;

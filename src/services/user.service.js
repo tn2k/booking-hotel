@@ -126,7 +126,7 @@ const createUser = async ({ name, password, email, phone, role }) => {
                 const privatekey = forge.pki.privateKeyToPem(keypair.privateKey);
                 const publickey = forge.pki.publicKeyToPem(keypair.publicKey);
 
-                const tokens = await createTokenPair({ userId: newUser.tenant_id, email }, publickey, privatekey)
+                const tokens = await createTokenPair({ payload: { userId: newUser.tenant_id, email }, publicKey: publickey, privateKey: privatekey })
 
                 await createKeyToken({
                     userId: newUser.tenant_id,
@@ -134,6 +134,7 @@ const createUser = async ({ name, password, email, phone, role }) => {
                     privatekey: privatekey,
                     refreshToken: tokens.refreshToken
                 })
+
                 return new SuccessResponse({
                     metadata: {
                         User: newUser,

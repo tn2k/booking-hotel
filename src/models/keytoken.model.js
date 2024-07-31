@@ -5,7 +5,7 @@ module.exports = (sequelize) => {
     class keytokenModels extends Model { }
     keytokenModels.init({
         user: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.UUID,
             allowNull: false,
             primaryKey: true,
             references: {
@@ -26,7 +26,7 @@ module.exports = (sequelize) => {
             defaultValue: []
         },
         refreshToken: {
-            type: DataTypes.STRING(512),
+            type: DataTypes.TEXT,
             allowNull: false
         },
     }, {

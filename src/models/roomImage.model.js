@@ -6,9 +6,9 @@ module.exports = (sequelize) => {
 
     RoomImage.init({
         image_id: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
             primaryKey: true,
-            autoIncrement: true
         },
         room_id: {
             type: DataTypes.INTEGER,
@@ -25,7 +25,7 @@ module.exports = (sequelize) => {
     });
 
     RoomImage.associate = (models) => {
-        RoomImage.belongsTo(models.Room, { foreignKey: 'room_id' });
+        RoomImage.belongsTo(models.Rooms, { foreignKey: 'room_id' });
     };
 
     return RoomImage;

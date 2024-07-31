@@ -5,23 +5,20 @@ module.exports = (sequelize) => {
     class House extends Model { }
 
     House.init({
-        room_id: {
+        house_id: {
             type: DataTypes.UUID,
-            allowNull: false,
-            references: {
-                model: 'Product',
-                key: 'product_id'
-            }
+            defaultValue: DataTypes.UUIDV4,
+            primaryKey: true,
         },
-        room_description: {
+        house_description: {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        room_detail: {
+        house_detail: {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        room_rules: {
+        house_rules: {
             type: DataTypes.STRING,
             allowNull: false,
         },
@@ -35,7 +32,7 @@ module.exports = (sequelize) => {
         },
     }, {
         sequelize,
-        modelName: 'House'
+        modelName: 'Houses'
     });
 
     return House;

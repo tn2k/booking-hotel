@@ -6,9 +6,9 @@ module.exports = (sequelize) => {
 
     RoomType.init({
         type_id: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
             primaryKey: true,
-            autoIncrement: true
         },
         type_name: DataTypes.STRING
     }, {

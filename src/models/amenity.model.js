@@ -6,9 +6,9 @@ module.exports = (sequelize) => {
 
     Amenity.init({
         amenity_id: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
             primaryKey: true,
-            autoIncrement: true
         },
         name: DataTypes.STRING
     }, {

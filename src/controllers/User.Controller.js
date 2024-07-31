@@ -67,11 +67,8 @@ const refreshToken = async (req, res, next) => {
         const { refreshToken } = req.body;
         if (!refreshToken) throw createError.BadRequest();
         const payload = await verifyRefreshToken(refreshToken);
-        console.log('check data  payload   :', payload)
         const accessToken = await signAccessToken(payload.tenant_id);
-        console.log('check data   accessToken  :', accessToken)
         const refToken = await singRefreshToken(payload.tenant_id);
-        console.log('check data     refToken:', refToken)
         res.json({
             accessToken,
             refreshToken: refToken
@@ -106,7 +103,8 @@ const ApiLogin = async ({ email, password, refreshToken = null }) => {
     privatekey = forge.pki.privateKeyToPem(keypair.privateKey);
     publickey = forge.pki.publicKeyToPem(keypair.publicKey);
 
-    const tokens = await createTokenPair({ userId: foundUser.tenant_id, email }, publickey, privatekey)
+    const tokens = await createTokenPair({ payload: { userId: foundUser.tenant_id, email }, publicKey: publickey, privateKey: privatekey })
+
 
     await createKeyToken({
         userId: foundUser.tenant_id,

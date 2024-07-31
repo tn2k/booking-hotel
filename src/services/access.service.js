@@ -23,7 +23,7 @@ const handlerRefreshToken = async ({ refreshToken, user, keyStore }) => {
     if (!foundUser) throw new AuthFailureError("Shop not registeted 2")
 
     // create due token 
-    const tokens = await createTokenPair({ payload: { userId, email }, publicKey: holderToken.publickey, privateKey: holderToken.privatekey })
+    const tokens = await createTokenPair({ payload: { userId, email }, publicKey: keyStore.publickey, privateKey: keyStore.privatekey })
 
     // update token
     await keyStore.update({

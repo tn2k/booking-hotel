@@ -6,8 +6,8 @@ Content-Type:  application/json
 {
     "name" : "tnnn",
     "password" :"1233219",
-    "email" :"8t12379@gmail.com",
-    "phone" : "1969976767684",
+    "email" :"123t123@gmail.com",
+    "phone" : "1936468664",
     "role" : "tenant"
 }
 
@@ -38,9 +38,9 @@ Content-Type: application/json
 
 
 {
-    "email" :"8t12379@gmail.com",
-   "password" :"1233219",
-    "refreshToken" :"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjU4LCJlbWFpbCI6Ijh0MTIzNzlAZ21haWwuY29tIiwiaWF0IjoxNzIxNzk2MTU3LCJleHAiOjE3MjI0MDA5NTd9.Rt3xNSMen_U8OdTgz8cDwl-Fd__KRaiXO4igAoOnR9LGZ2t7vw-gHo24_NGqT7Ek4Bc71QllJZms1HWgE01AYZMUgfEtcMB12fi21g3XCjMklJanRBSmvpWTMOldHnj5droVvhSURVBPPXxUFBzO67j1S8Z3AGnLoqB60xUqtkqEejs3Lwc8q--e8cBIdRhBEooPTGDbIgMQ9VRtafOqIO8bQjjlyVbW0fCVWYHRdk6iPBboxkFMUIugkFhpLQf0uV_LuDLumIvhxkUiY_iqQjCntZFnx-gdDnP938neM147RnAHa0KizfG9Zef9CC_bMt5GTXL0GjQx8Wo79VxQWQ"
+    "email" :"123t123@gmail.com",
+    "password" :"1233219",
+    "refreshToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTExZTNjNi1mZGZhLTQzYjctOWI1Mi00Nzk2OTk1MjBmNTQiLCJlbWFpbCI6IjEyM3QxMjNAZ21haWwuY29tIiwiaWF0IjoxNzIyNDIyNTExLCJleHAiOjE3MjMwMjczMTF9.TfIIwjy1ZtY1tjlXjt1xqgVsIko612Aw0Bgtu20tnrguz92Gu5AC0-KeP_v91jQCLAXopXRigRH4P4EbylraCr2c7ZEA5w26kpM7ErT7NJSPetOZUvp_13qXG-5UoFmy0ay-xeVK3Biyqk6Iv-TdDIjXuhOKD9R87RM7EX3j9VMYKc_dFRSfnxVqUSNhyYnDyW1za9Jw78jL6R4V0IP-tbHVKQnh2b9BNxApV3EpALMOVEtEmsXfCPobTmV9WIHuqPUuXLO79SI1erf4yDe4BVLtEuKqYCDzklzSUo4gUrATte3q_nrQ8CzP5onaH3ch34-PHa-jxXOFyDWJwfI-mg"
 }
 
 

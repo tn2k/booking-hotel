@@ -6,9 +6,9 @@ module.exports = (sequelize) => {
 
     Transaction.init({
         transaction_id: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
             primaryKey: true,
-            autoIncrement: true
         },
         room_id: {
             type: DataTypes.INTEGER,
@@ -37,7 +37,7 @@ module.exports = (sequelize) => {
     });
 
     Transaction.associate = (models) => {
-        Transaction.belongsTo(models.Room, { foreignKey: 'room_id' });
+        Transaction.belongsTo(models.Rooms, { foreignKey: 'room_id' });
         Transaction.belongsTo(models.Users, { foreignKey: 'tenant_id' });
         Transaction.hasMany(models.Payment, { foreignKey: 'rental_id' });
     };
