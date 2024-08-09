@@ -3,59 +3,16 @@
 const db = require('../models/index')
 const hash = require('bcrypt');
 const OtpGenerator = require('otp-generator')
-const { Op } = require('sequelize');
-const _Otp = require('../models/otp.model')
 const { hashPassword } = require('../services/auth.service');
 const forge = require('node-forge');
 const { createTokenPair } = require('../auth/jwt_service')
 const { createKeyToken } = require('./keyToken.service')
 const { BadRequestError } = require("../core/error.response")
 const { SuccessResponse } = require("../core/success.response")
-const keytokenModel = require('../models/keytoken.model');
-
-const {
-    insertOtp,
-    validOtp
-} = require('./opt.service');
-const { format } = require('morgan');
 
 
 
-const verifyotp = async ({
-    email,
-    otp
-}) => {
-    try {
-        const otpHolder = await _Otp.find({
-            email
-        })
-        if (!otpHolder.length) {
-            return {
-                code: 404,
-                message: 'expired OTP'
-            }
-        }
-        const lastOtp = otpHolder[otpHolder.length - 1]
-        const validOtp = await validOtp({
-            otp,
-            hashOtp: lastOtp.otp
-        })
-        if (validOtp) {
-            return {
-                code: 401,
-                message: 'Invalid Otp'
-            }
-        }
-        if (validOtp && email === lastOtp.email) {
-            return {
-                code: 201,
-                message: 'OTP verified successfully'
-            }
-        }
-    } catch (error) {
-        console.error(error)
-    }
-}
+
 
 const regisuser = async ({ email }) => {
     const user = await db.Users.findOne({
@@ -214,7 +171,6 @@ const deleteDataUser = async (userId) => {
 
 
 module.exports = {
-    verifyotp,
     regisuser,
     getAllUsers,
     createUser,

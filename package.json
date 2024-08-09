@@ -45,6 +45,7 @@
     "promise": "^8.3.0",
     "redis": "^4.6.14",
     "sequelize": "^6.37.3",
-    "sequelize-cli": "^6.6.2"
+    "sequelize-cli": "^6.6.2",
+    "slugify": "^1.6.6"
   }
 }

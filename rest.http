@@ -1,13 +1,13 @@
 ###
-POST http://localhost:8081/v1/api/createNewUser
+POST http://localhost:8081/v1/api/access/signUp
 Content-Type:  application/json
 # x-api-key : f8db3f5f7e925f335b592f30a4b224811d30f5a623d1a430e11cb3d166215da3
 
 {
     "name" : "tnnn",
     "password" :"1233219",
-    "email" :"123t123@gmail.com",
-    "phone" : "1936468664",
+    "email" :"123t12345@gmail.com",
+    "phone" : "1936448664",
     "role" : "tenant"
 }
 
@@ -33,14 +33,14 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:8081/v1/api/login
+POST http://localhost:8081/v1/api/access/login
 Content-Type: application/json
 
 
 {
-    "email" :"123t123@gmail.com",
+    "email" :"123t12345@gmail.com",
     "password" :"1233219",
-    "refreshToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTExZTNjNi1mZGZhLTQzYjctOWI1Mi00Nzk2OTk1MjBmNTQiLCJlbWFpbCI6IjEyM3QxMjNAZ21haWwuY29tIiwiaWF0IjoxNzIyNDIyNTExLCJleHAiOjE3MjMwMjczMTF9.TfIIwjy1ZtY1tjlXjt1xqgVsIko612Aw0Bgtu20tnrguz92Gu5AC0-KeP_v91jQCLAXopXRigRH4P4EbylraCr2c7ZEA5w26kpM7ErT7NJSPetOZUvp_13qXG-5UoFmy0ay-xeVK3Biyqk6Iv-TdDIjXuhOKD9R87RM7EX3j9VMYKc_dFRSfnxVqUSNhyYnDyW1za9Jw78jL6R4V0IP-tbHVKQnh2b9BNxApV3EpALMOVEtEmsXfCPobTmV9WIHuqPUuXLO79SI1erf4yDe4BVLtEuKqYCDzklzSUo4gUrATte3q_nrQ8CzP5onaH3ch34-PHa-jxXOFyDWJwfI-mg"
+     "refreshToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhODUwMjVjMS1iMzkzLTRmM2YtOGE0Yy0yMzNjMzRkNTQxZTAiLCJlbWFpbCI6IjEyM3QxMjM0NUBnbWFpbC5jb20iLCJpYXQiOjE3MjMyMzczNTIsImV4cCI6MTcyMzg0MjE1Mn0.wlklIcSsSaIKu2tJzUBR46xkM-04R7blY4j9I2q9mwE4CqgYa206J9Yh58n8BWj46UNd3SfAHZvxw0b8bovw6IosNpw-FIR_sI9wJM7naBi_CSWtLqnRgTvCqSCIQ28CrBKrPgv5CtQWFsL4_iuFwn5ledr3mu6QPavEjh8-3QtB-x7Z8QsGp5AAFjrSZxcVV0D_6yQ5uUNFjjZI-F4rKzc1dwNciMBwPx6zhyPIEdHdxOkcue2p1FCI4LWSG5aKrlECFx0z7e_sKqoj2B7G2jtzm0yohC21yJwj6G1cmrE4eOnX2lE-TZ9sjNl879_aPwQ8OPG2bnwrIQZB5Z45zw"
 }
 
 

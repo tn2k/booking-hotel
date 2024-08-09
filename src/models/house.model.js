@@ -10,6 +10,13 @@ module.exports = (sequelize) => {
             defaultValue: DataTypes.UUIDV4,
             primaryKey: true,
         },
+        product_user: {
+            type: DataTypes.UUID,
+            references: {
+                model: 'Users',
+                key: 'tenant_id'
+            }
+        },
         house_description: {
             type: DataTypes.STRING,
             allowNull: false,

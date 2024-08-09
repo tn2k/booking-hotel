@@ -1,14 +1,24 @@
 const express = require('express')
 const routes = express.Router()
 
-const { createProduct } = require('../../controllers/product.controller')
+const { createProduct, getAllDraftForUser, getAllPublishForUser, publishProductByUser, unPublishProductByUser, getListSearchProduct, findAllProducts, findProducts, updateProduct } = require('../../controllers/product.controller')
 const { authentication, } = require('../../auth/jwt_service')
 const { asyncHandler } = require("../../helpers/asyncHandler")
 
+routes.post('/search/:keySearch', asyncHandler(getListSearchProduct))
+routes.get('/:product_id', asyncHandler(findProducts))
+routes.get('', asyncHandler(findAllProducts))
 
 // authentication
 routes.use(authentication)
 //////////////////
-routes.post('/product', asyncHandler(createProduct))
+routes.post('', asyncHandler(createProduct))
+routes.patch('/:productId', asyncHandler(updateProduct))
+routes.post('/publish/:id', asyncHandler(publishProductByUser))
+routes.post('/unpublish/:id', asyncHandler(unPublishProductByUser))
+
+// QUERY // 
+routes.get('/drafts/all', asyncHandler(getAllDraftForUser))
+routes.get('/published/all', asyncHandler(getAllPublishForUser))
 
 module.exports = routes; 

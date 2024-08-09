@@ -6,16 +6,16 @@ const sequelize = new Sequelize(`${process.env.DB_NAME}`, `${process.env.DB_USER
     host: `${process.env.DB_HOST}`,
     port: `${process.env.DB_PORT}`,
     dialect: 'mysql',
-    // logging: false,
-    // pool: {
-    //     max: 10,
-    //     min: 0,
-    //     acquire: 30000,
-    //     idle: 10000
-    // },
-    // dialectOptions: {
-    //     connectTimeout: 60000 // setup timeout connection (ms)
-    // }
+    logging: false,
+    pool: {
+        max: 10,
+        min: 0,
+        acquire: 30000,
+        idle: 10000
+    },
+    dialectOptions: {
+        connectTimeout: 60000 // setup timeout connection (ms)
+    }
 });
 
 let connectdb = async () => {

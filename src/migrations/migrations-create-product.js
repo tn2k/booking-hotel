@@ -1,11 +1,13 @@
 'use strict';
 
+const slugify = require('slugify');
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('Products', {
       product_id: {
         type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4,
+        allowNull: false,
         primaryKey: true,
       },
       product_user: {
@@ -15,6 +17,11 @@ module.exports = {
       product_name: {
         type: Sequelize.STRING,
         allowNull: false,
+      },
+      product_slug: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
       },
       product_thumb: {
         type: Sequelize.STRING,
@@ -40,9 +47,35 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      product_ratingsAverage: {
+        type: Sequelize.FLOAT,
+        defaultValue: 4.5,
+        validate: {
+          min: {
+            args: [1],
+            msg: "Rating must be above 1.0"
+          },
+          max: {
+            args: [5],
+            msg: "Rating must be below 5.0"
+          }
+        },
+      },
+      product_variations: {
+        type: Sequelize.JSON,
+        defaultValue: []
+      },
+      isDraft: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true
+      },
+      isPublished: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+      },
       product_attributes: {
         type: Sequelize.JSON,
-        allowNull: false,
+        allowNull: false
       },
       createdAt: {
         allowNull: false,
