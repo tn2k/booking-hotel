@@ -9,6 +9,7 @@ const { createTokenPair } = require('../auth/jwt_service')
 const { createKeyToken } = require('./keyToken.service')
 const { BadRequestError } = require("../core/error.response")
 const { SuccessResponse } = require("../core/success.response")
+const KeyTokenService = require('./keyToken.service');
 
 
 
@@ -106,27 +107,33 @@ const createUser = async ({ name, password, email, phone, role }) => {
     }
 }
 
-const getDataUser = async (userId) => {
-    const user = await db.Users.findOne({
-        where: { id: userId },
-        raw: true,
-    });
-    if (!user) {
-        return {
-            StatusCode: 400,
-            message: 'this user is not exists!'
+const getDataUser = async ({ userId }) => {
+    try {
+        const user = await db.Users.findOne({
+            where: { tenant_id: userId },
+            raw: true,
+        });
+        if (!user) {
+            return {
+                StatusCode: 400,
+                message: 'this user is not exists!'
+            }
         }
-    }
-    return {
-        StatusCode: 0,
-        message: 'Get data User edit success!',
-        metadata: user
+        return {
+            StatusCode: 0,
+            message: 'Get data User edit success!',
+            metadata: user
+        }
+    } catch (error) {
+        console.error('Error get data user edit:', error);
+        throw (error)
     }
 }
 
 const updateDataUser = async (dataEditUser) => {
+    console.log('check daaata ', dataEditUser)
     try {
-        const user = await db.Users.findByPk(dataEditUser.id);
+        const user = await db.Users.findByPk(dataEditUser.tenant_id);
         if (!user) {
             return {
                 StatusCode: 404,
@@ -134,7 +141,7 @@ const updateDataUser = async (dataEditUser) => {
             };
         }
         await db.Users.update(dataEditUser, {
-            where: { id: dataEditUser.id }
+            where: { tenant_id: dataEditUser.tenant_id }
         });
         return {
             StatusCode: 0,
@@ -142,11 +149,11 @@ const updateDataUser = async (dataEditUser) => {
         };
     } catch (error) {
         console.error('Error updating user:', error);
-        next(error)
+        throw (error)
     }
 }
 
-const deleteDataUser = async (userId) => {
+const deleteDataUser = async ({ userId }) => {
     try {
         const user = await db.Users.findByPk(userId);
         if (!user) {
@@ -155,16 +162,18 @@ const deleteDataUser = async (userId) => {
                 message: 'User not found',
             };
         }
+        await KeyTokenService.removeKeyById(userId)
         await db.Users.destroy({
-            where: { id: userId }
+            where: { tenant_id: userId }
         });
+
         return {
             StatusCode: 0,
             message: 'Delete user success',
         };
     } catch (error) {
         console.error('Error delete user:', error);
-        next(error)
+        throw (error)
     }
 }
 

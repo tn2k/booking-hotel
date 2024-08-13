@@ -82,6 +82,34 @@ const authentication = asyncHandler(async (req, res, next) => {
 const verifyJWT = async (token, keySecret) => {
     return await JWT.verify(token, keySecret);
 }
+
+const verifyAccessToken = (req, res, next) => {
+    if (!req.header('authorization')) {
+        return next(createError.Unauthorized)
+    }
+    const authHeader = req.headers.authorization;
+    const bearerToken = authHeader.split(' ');
+    const token = bearerToken[1];
+    JWT.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
+        if (err) {
+            if (err.name === 'JsonWebTokenError') {
+                return next(createError.Unauthorized())
+            }
+            return next(createError.Unauthorized(err.message));
+        }
+        req.payload = payload
+        next();
+    })
+}
+
+
+module.exports = {
+    createTokenPair,
+    authentication,
+    verifyJWT,
+    verifyAccessToken,
+};
+
 // const signAccessToken = async (userId, publicKey, privateKey) => {
 //     return new Promise((resolve, reject) => {
 //         const userId = {
@@ -124,26 +152,6 @@ const verifyJWT = async (token, keySecret) => {
 //     });
 // }
 
-
-const verifyAccessToken = (req, res, next) => {
-    if (!req.header('authorization')) {
-        return next(createError.Unauthorized)
-    }
-    const authHeader = req.headers.authorization;
-    const bearerToken = authHeader.split(' ');
-    const token = bearerToken[1];
-    JWT.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
-        if (err) {
-            if (err.name === 'JsonWebTokenError') {
-                return next(createError.Unauthorized())
-            }
-            return next(createError.Unauthorized(err.message));
-        }
-        req.payload = payload
-        next();
-    })
-}
-
 // const verifyRefreshToken = async (refreshToken) => {
 //     return new Promise((resolve, reject) => {
 //         JWT.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, payload) => {
@@ -163,13 +171,3 @@ const verifyAccessToken = (req, res, next) => {
 //         })
 //     })
 // }
-
-module.exports = {
-    createTokenPair,
-    authentication,
-    verifyJWT,
-    verifyAccessToken,
-    // signAccessToken,
-    // singRefreshToken,
-    // verifyRefreshToken,
-};

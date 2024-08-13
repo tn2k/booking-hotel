@@ -23,24 +23,42 @@ const removeUndefinedObject = obj => {
     return obj
 }
 
-const undateNestedObjectParser = obj => {
+// const updateNestedObjectParser = obj => {
+//     console.log('check obj  1', obj)
+//     const final = {}
+//     Object.keys(obj).forEach(k => {
+//         if (typeof obj[k] === 'Object' && !Array.isArray(obj[k])) {
+//             const response = updateNestedObjectParser(obj[k])
+//             Object.keys(response.forEach(a => {
+//                 final[`${k}.${a}`] = res[a]
+//             }))
+//         }
+//     })
+//     console.log('check obj  2', final)
+//     return final
+// }
+
+const updateNestedObjectParser = (obj) => {
     console.log('check obj  1', obj)
-    const final = {}
+    const final = {};
     Object.keys(obj).forEach(k => {
-        if (typeof obj[k] === 'Object' && !Array.isArray) {
-            const response = updateNestObjectParser(obj[k])
-            Object.keys(response.forEach(a => {
-                final[`${k}.${a}`] = res[a]
-            }))
+        if (typeof obj[k] === 'object' && !Array.isArray(obj[k])) {
+            const response = updateNestedObjectParser(obj[k]);
+            Object.keys(response).forEach(a => {
+                final[`${k}.${a}`] = response[a];
+            });
+        } else {
+            final[k] = obj[k];
         }
-    })
+    });
     console.log('check obj  2', final)
-    return final
-}
+    return final;
+};
+
 module.exports = {
     getIntoData,
     getSelectData,
     unGetSelectData,
     removeUndefinedObject,
-    undateNestedObjectParser
+    updateNestedObjectParser,
 }

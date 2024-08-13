@@ -2,9 +2,8 @@
 
 const db = require('../models/index')
 const { BadRequestError } = require("../core/error.response")
-const { where, Model } = require('sequelize')
 const { findAllDraftsForUser, publishProductByUser, findAllPublishForShop, unPublishProductByUser, searchProductByUser, findAllProducts, findProduct } = require("../models/respositories/product.repo")
-const { object } = require('joi')
+const { removeUndefinedObject, updateNestedObjectParser } = require("../utils/index")
 
 class ProductFactory {
     static async createProduct(type, payload) {
@@ -19,9 +18,14 @@ class ProductFactory {
     }
 
     static async updateProduct(type, productId, payload) {
-        const productClass = ProductFactory.productRegistry[type]
-        if (!productClass) throw new BadRequestError(`Invalid Product Type ${type}`)
-        return new productClass(payload).updateProduct(productId)
+        switch (type) {
+            case "Room":
+                return new Room(payload).updateProduct(productId)
+            case "House":
+                return new House(payload).updateProduct(productId)
+            default:
+                throw new BadRequestError(`Invalid Product Type ${type}`)
+        }
     }
     // PUT //
     static async publishProductByUser({ product_user, product_id }) {
@@ -55,7 +59,7 @@ class ProductFactory {
     }
 
     static async findProduct({ product_id }) {
-        return await findProduct({ product_id })
+        return await findProduct(product_id)
     }
 }
 
@@ -86,10 +90,16 @@ class Product {
 
     // Update product
     async updateProduct(productId, bodyUpdate) {
-        return await productId.findByIdAndUpdate({ productId, bodyUpdate, model: Products })
+        await db.Products.update(bodyUpdate, {
+            where: {
+                product_id: productId,
+            },
+        });
+        const updatedProduct = await db.Products.findByPk(productId);
+        return updatedProduct
     }
 }
-
+// findByIdAndUpdate({ productId, bodyUpdate, model: Products })
 class Room extends Product {
     async createProduct() {
         const newRoom = await db.Rooms.create({
@@ -102,7 +112,7 @@ class Room extends Product {
         return newProduct
     }
 
-    async updataProduct(productId) {
+    async updateProduct(productId) {
         //1. remove attr has null underfined
         console.log("check data this  1", this)
         const objectParams = removeUndefinedObject(this)
@@ -110,15 +120,20 @@ class Room extends Product {
         //2. check xem update o cho nao ?
         if (objectParams.product_attributes) {
             // update child
-            await updateProductById({
-                productId,
-                bodyUpdate: updateNestObjectParser(objectParams.product_attributes),
-                model: Rooms
-            })
+            // await updateProductById({
+            //     productId,
+            //     bodyUpdate: updateNestObjectParser(objectParams.product_attributes),
+            //     model: Rooms
+            // })
+            await db.Rooms.update(updateNestedObjectParser(objectParams.product_attributes), {
+                where: {
+                    room_id: productId,
+                },
+            });
         }
-        const updateProduct = await super.updateProduct(productId, updateNestObjectParser(objectParams))
+        const updateProduct = await super.updateProduct(productId, updateNestedObjectParser(objectParams))
+        console.log(" check data updateProduct ", updateProduct)
         return updateProduct
-
     }
 
 }

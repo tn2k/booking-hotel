@@ -2,8 +2,18 @@
 const { lowerCase } = require('lodash');
 const { DataTypes, Model } = require('sequelize');
 const slugify = require('slugify')
+
+
 module.exports = (sequelize) => {
-    class Products extends Model { }
+    class Products extends Model {
+        static associate(models) {
+            // Một Products có nhiều Users
+            Products.hasMany(models.Users, {
+                foreignKey: 'tenant_id', // Khóa ngoại trong bảng Users
+                as: 'users' // Alias cho mối quan hệ
+            });
+        }
+    }
 
     Products.init({
         product_id: {
@@ -105,6 +115,7 @@ module.exports = (sequelize) => {
             }
         }
     });
+
     return Products;
 };
 

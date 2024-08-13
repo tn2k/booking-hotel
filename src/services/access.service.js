@@ -50,7 +50,6 @@ const apiLogin = async ({ email, password, refreshToken = null }) => {
 
 const logout = async (keyStore) => {
     const delKey = await KeyTokenService.removeKeyById(keyStore.user)
-    console.log(({ delKey }))
     return delKey
 }
 

@@ -4,7 +4,8 @@ const { StatusCode, ReasonStatusCode } = require("../utils/httpStatusCode")
 class SuccessResponse {
 
     constructor({ message, statusCode = StatusCode.OK, reasonStatusCode = ReasonStatusCode.OK, metadata = {} }) {
-        this.message = message ? reasonStatusCode : message;
+        // ? reasonStatusCode : message;
+        this.message = message ? message : reasonStatusCode;
         this.statusCode = statusCode;
         this.metadata = metadata;
     }

@@ -1,9 +1,10 @@
 'use strict'
 
-
+const Sequelize = require("sequelize")
 const db = require('../index');
 const Users = require('../user.model')
-const { getSelectData } = require('../../utils/index')
+const { getSelectData } = require('../../utils/index');
+const { where } = require('sequelize');
 
 const findAllDraftsForUser = async ({ query, limit, skip }) => {
     return await queryProduct({ query, limit, skip })
@@ -14,49 +15,66 @@ const findAllPublishForShop = async ({ query, limit, skip }) => {
 }
 
 const searchProductByUser = async ({ keySearch }) => {
-    const regexSearch = new RegExp(keySearch)
-    const results = await db.Products.find({
-        isPublished: true,
-        $text: { $search: regexSearch },
-    }, { score: { $meta: "textScore" } })
-        .sort({ score: { $meta: " textScore" } })
-    return results
-}
-
+    const results = await db.Products.findAll({
+        where: {
+            product_slug: {
+                [Sequelize.Op.like]: `%${keySearch}%`
+            }
+        },
+        attributes: {
+            include: [
+                [Sequelize.literal(`MATCH (product_slug) AGAINST (:search IN NATURAL LANGUAGE MODE)`), 'score']
+            ]
+        },
+        order: [
+            [Sequelize.literal(`score`), 'DESC']
+        ],
+        replacements: { search: keySearch }
+    });
+    return results;
+};
 const publishProductByUser = async ({ product_user, product_id }) => {
-    const foundUser = await db.Products.findOne({
-        product_user: new Types.Object(product_user),
-        _id: new Types.Object(product_id)
-    })
-    if (!foundUser) return null
+    try {
+        const foundUser = await db.Products.findOne({
+            product_user: product_user,
+            product_id: product_id,
+        })
+        console.log("foundUser", foundUser)
+        if (!foundUser) return null
+        const updatedProduct = await db.Products.update(
+            { isDraft: false, isPublished: true },
+            { where: { product_user: product_user, product_id: product_id } }
+        );
+        console.log("updatedProduct", updatedProduct)
+        if (updatedProduct === 0) return null
+        const Product = await db.Products.findByPk(product_id);
+        return Product
+    } catch (error) {
 
-    foundUser.isDraft = false
-    foundUser.isPublished = true
-
-    const { modifiedCount } = await foundUser.update(foundUser)
-
-    return modifiedCount
+    }
 }
 
 const unPublishProductByUser = async ({ product_user, product_id }) => {
     const foundUser = await db.Products.findOne({
-        product_user: new Types.Object(product_user),
-        _id: new Types.Object(product_id)
+        product_user: product_user,
+        product_id: product_id,
     })
     if (!foundUser) return null
 
-    foundUser.isDraft = true
-    foundUser.isPublished = false
-
-    const { modifiedCount } = await foundUser.update(foundUser)
-
-    return modifiedCount
+    const updatedProduct = await db.Products.update(
+        { isDraft: true, isPublished: false },
+        { where: { product_user: product_user, product_id: product_id } }
+    );
+    if (updatedProduct === 0) return null
+    const Product = await db.Products.findByPk(product_id);
+    return Product
 }
+
 
 const findAllProducts = async ({ limit, sort, page, filter, select }) => {
     const skip = (page - 1) * limit;
     const sortBy = sort === 'ctime' ? { _id: -1 } : { _id: 1 }
-    const products = await db.Products.find(filter)
+    const products = await db.Products.findAll(filter)
         .sort(sortBy)
         .skip(skip)
         .limit(limit)
@@ -64,8 +82,11 @@ const findAllProducts = async ({ limit, sort, page, filter, select }) => {
     return products
 }
 
-const findProduct = async ({ product_id }) => {
-    return await db.product.findById(product_id)
+const findProduct = async (product_id) => {
+    return await db.Products.findOne({
+        where: { product_id },
+        raw: true
+    })
 }
 
 const updateProductById = async ({
@@ -80,17 +101,23 @@ const updateProductById = async ({
 }
 
 const queryProduct = async ({ query, limit, skip }) => {
-    return await db.Products.findAll({
-        where: query,
-        include: [{
-            model: Users,
-            attributes: ['name', 'email'],
-        }],
-        order: [['updatedAt', 'DESC']],
-        offset: skip,
-        limit: limit,
-        raw: true,
-    });
+    try {
+        return await db.Products.findAll({
+            where: query,
+            include: [
+                {
+                    model: db.Users,
+                    as: 'users',
+                    attributes: ['tenant_id', 'name', 'email'],
+                }
+            ],
+            order: [['updatedAt', 'DESC']],
+            offset: skip,
+            limit: limit,
+        });
+    } catch (error) {
+        throw error
+    }
 }
 
 
@@ -101,5 +128,6 @@ module.exports = {
     unPublishProductByUser,
     searchProductByUser,
     findAllProducts,
-    findProduct
+    findProduct,
+    updateProductById
 }

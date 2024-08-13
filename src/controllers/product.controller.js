@@ -33,8 +33,8 @@ const getAllPublishForUser = async (req, res, next) => {
 
 const updateProduct = async (req, res, next) => {
     new SuccessResponse({
-        message: "updateProduct success!",
-        metadata: await ProductService.updateProduct(req.body.product_type, req.params.product_id, {
+        message: "Update Product success!",
+        metadata: await ProductService.updateProduct(req.body.product_type, req.params.productId, {
             ...req.body,
             product_user: req.user.userId
         })
@@ -43,7 +43,7 @@ const updateProduct = async (req, res, next) => {
 
 const publishProductByUser = async (req, res, next) => {
     new SuccessResponse({
-        message: "publishProductByUser success!",
+        message: "publish Product By User success!",
         metadata: await ProductService.publishProductByUser({
             product_user: req.user.userId,
             product_id: req.params.id
@@ -79,7 +79,7 @@ const findAllProducts = async (req, res, next) => {
 const findProducts = async (req, res, next) => {
     new SuccessResponse({
         message: "Get list findProducts success!",
-        metadata: await ProductService.findProducts({
+        metadata: await ProductService.findProduct({
             product_id: req.params.product_id
         })
     }).send(res)

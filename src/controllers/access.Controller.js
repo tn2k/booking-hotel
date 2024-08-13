@@ -3,16 +3,12 @@ const { getAllUsers, createUser, getDataUser, updateDataUser, deleteDataUser } =
 const { OK, CREATED, SuccessResponse } = require("../core/success.response")
 const { apiLogin, logout, handlerRefreshToken } = require("../services/access.service");
 
-
-
-/**
+/*
  * handerRefreshToken 
  * logout 
  * login 
  * signup 
- * 
  */
-
 
 const handlerRefreshToKen = async (req, res, next) => {
   new SuccessResponse({
@@ -25,6 +21,21 @@ const handlerRefreshToKen = async (req, res, next) => {
   }).send(res)
 };
 
+const login = async (req, res, next) => {
+  console.log("check data", req.body)
+  new SuccessResponse({
+    message: "Login User success!",
+    metadata: await apiLogin(req.body)
+  }).send(res)
+};
+
+const signUp = async (req, res, next) => {
+  new CREATED({
+    message: "Registered OK",
+    metadata: await createUser(req.body),
+  }).send(res)
+};
+
 const logOut = async (req, res, next) => {
   new SuccessResponse({
     message: "logout User success !",
@@ -32,38 +43,18 @@ const logOut = async (req, res, next) => {
   }).send(res)
 };
 
-const login = async (req, res, next) => {
-  new SuccessResponse({
-    message: "Logout User success!",
-    metadata: await apiLogin(req.body)
-  }).send(res)
-};
-
-const signUp = async (req, res, next) => {
-  console.log('log 1')
-  const data = await createUser(req.body)
-  new CREATED({
-    message: "Registered OK",
-    metadata: data.metadata,
-  }).send(res)
-};
-
 const getListUsers = async (req, res, next) => {
   new SuccessResponse({
     message: "Get list User success!",
-    metadata: await handlerRefreshToken({
-      refreshToken: req.refreshToken,
-      user: req.user,
-      keyStore: req.keyStore
-    })
+    metadata: await getAllUsers()
   }).send(res)
 };
 
 const getEditUser = async (req, res, next) => {
-  let userId = req.params.id;
+  console.log("check data userId: req.params.id  ", req.params.id)
   new SuccessResponse({
     message: "Get data User edit success!",
-    metadata: await getDataUser(userId)
+    metadata: await getDataUser({ userId: req.params.id })
   }).send(res)
 };
 
@@ -77,11 +68,9 @@ const updateUser = async (req, res, next) => {
 const deleteUser = async (req, res, next) => {
   new SuccessResponse({
     message: "Delete User success!",
-    metadata: await updateDataUser(req.params.id)
+    metadata: await deleteDataUser({ userId: req.params.id })
   }).send(res)
 };
-
-
 
 module.exports = {
   handlerRefreshToKen,
@@ -93,7 +82,6 @@ module.exports = {
   updateUser,
   deleteUser,
 };
-
 
 // const getEditUsers = async (req, res, next) => {
 //   let userId = req.params.id;

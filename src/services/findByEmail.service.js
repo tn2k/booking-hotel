@@ -11,7 +11,7 @@ const findByEmail = async (email) => {
         return user;
     } catch (error) {
         console.error('Lỗi:', error);
-        next(error);
+        throw (error);
     }
 }
 

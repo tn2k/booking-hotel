@@ -8,16 +8,14 @@ const { asyncHandler } = require("../../helpers/asyncHandler")
 
 routes.post('/signUp', asyncHandler(signUp))
 routes.post('/login', asyncHandler(login))
-
-
-routes.get('/getListUsers', getListUsers)
-routes.get('/editUser/:id', getEditUser)
-routes.patch('/patchUser', updateUser)
-routes.get('/deleteUser/:id', deleteUser)
+routes.get('/getListUsers', asyncHandler(getListUsers))
+routes.get('/editUser/:id', asyncHandler(getEditUser))
 // authentication 
 routes.use(authentication)
 //////////////////////////
 
+routes.patch('/patchUser', asyncHandler(updateUser))
+routes.delete('/deleteUser/:id', asyncHandler(deleteUser))
 
 routes.post('/logout', asyncHandler(logOut))
 routes.post('/handlerRefreshToKen', asyncHandler(handlerRefreshToKen))
