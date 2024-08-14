@@ -53,7 +53,7 @@ const publishProductByUser = async (req, res, next) => {
 
 const unPublishProductByUser = async (req, res, next) => {
     new SuccessResponse({
-        message: "publishProductByUser success!",
+        message: "Unpublish Product By User success!",
         metadata: await ProductService.unPublishProductByUser({
             product_user: req.user.userId,
             product_id: req.params.id
