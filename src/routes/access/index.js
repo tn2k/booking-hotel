@@ -5,11 +5,11 @@ const { authentication } = require('../../auth/jwt_service')
 const { asyncHandler } = require("../../helpers/asyncHandler")
 
 // SignUp 
-
 routes.post('/signUp', asyncHandler(signUp))
 routes.post('/login', asyncHandler(login))
 routes.get('/getListUsers', asyncHandler(getListUsers))
 routes.get('/editUser/:id', asyncHandler(getEditUser))
+
 // authentication 
 routes.use(authentication)
 //////////////////////////

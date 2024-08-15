@@ -21,10 +21,6 @@ module.exports = (sequelize) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        room_detail: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
         room_rules: {
             type: DataTypes.STRING,
             allowNull: false,

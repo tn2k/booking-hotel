@@ -83,11 +83,6 @@ const handlerRefreshToken = async ({ refreshToken, user, keyStore }) => {
     }
 }
 
-
-
-
-
-
 module.exports = {
     apiLogin,
     logout,

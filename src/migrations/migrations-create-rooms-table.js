@@ -16,10 +16,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      room_detail: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
       room_rules: {
         type: Sequelize.STRING,
         allowNull: false,

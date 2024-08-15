@@ -3,7 +3,7 @@
 const db = require('../models/index')
 const { BadRequestError } = require("../core/error.response")
 const { findAllDraftsForUser, publishProductByUser, findAllPublishForShop, unPublishProductByUser, searchProductByUser, findAllProducts, findProduct } = require("../models/respositories/product.repo")
-const { removeUndefinedObject, updateNestedObjectParser } = require("../utils/index")
+const { removeUndefinedObject, updateNestedObjectParser, transformAmenities } = require("../utils/index")
 
 class ProductFactory {
     static async createProduct(type, payload) {
@@ -66,7 +66,7 @@ class ProductFactory {
 class Product {
     constructor({
         product_name, product_thumb, product_price, product_quantity,
-        product_type, product_size, product_address, product_attributes, product_user
+        product_type, product_size, product_address, product_attributes, product_user, product_amenities
     }) {
         this.product_name = product_name
         this.product_thumb = product_thumb
@@ -77,6 +77,7 @@ class Product {
         this.product_address = product_address
         this.product_user = product_user
         this.product_attributes = product_attributes
+        this.product_amenities = product_amenities
     }
 
     // create new product
@@ -85,7 +86,7 @@ class Product {
             ...this,
             product_id: id
         };
-        return await db.Products.create(productData)
+        return await db.Products.create(productData);
     }
 
     // Update product
@@ -102,29 +103,31 @@ class Product {
 // findByIdAndUpdate({ productId, bodyUpdate, model: Products })
 class Room extends Product {
     async createProduct() {
-        const newRoom = await db.Rooms.create({
-            ...this.product_attributes,
-            product_user: this.product_user
-        })
-        if (!newRoom) throw new BadRequestError("create new Room error")
-        const newProduct = await super.createProduct(newRoom.room_id)
-        if (!newProduct) throw new BadRequestError("create new Product error")
-        return newProduct
+        try {
+            const newRoom = await db.Rooms.create({
+                ...this.product_attributes,
+                product_user: this.product_user
+            })
+            if (!newRoom) throw new BadRequestError("create new Room error")
+            const dataNewAmenities = transformAmenities({ ...this.product_amenities })
+            const newAmenities = await db.Amenities.create({
+                ...dataNewAmenities,
+                amenity_id: newRoom.room_id
+            })
+            if (!newAmenities) throw new BadRequestError("create new Amenities error")
+            const newProduct = await super.createProduct(newRoom.room_id)
+            if (!newProduct) throw new BadRequestError("create new Product error")
+            return newProduct
+        } catch (error) {
+            throw error
+        }
     }
 
     async updateProduct(productId) {
         //1. remove attr has null underfined
-        console.log("check data this  1", this)
         const objectParams = removeUndefinedObject(this)
-        console.log("check data this  2", objectParams)
-        //2. check xem update o cho nao ?
+        //2. check xem update o cho nao ? 
         if (objectParams.product_attributes) {
-            // update child
-            // await updateProductById({
-            //     productId,
-            //     bodyUpdate: updateNestObjectParser(objectParams.product_attributes),
-            //     model: Rooms
-            // })
             await db.Rooms.update(updateNestedObjectParser(objectParams.product_attributes), {
                 where: {
                     room_id: productId,
@@ -132,10 +135,8 @@ class Room extends Product {
             });
         }
         const updateProduct = await super.updateProduct(productId, updateNestedObjectParser(objectParams))
-        console.log(" check data updateProduct ", updateProduct)
         return updateProduct
     }
-
 }
 
 class House extends Product {

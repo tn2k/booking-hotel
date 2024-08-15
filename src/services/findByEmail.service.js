@@ -1,5 +1,4 @@
 
-
 const db = require('../models/index')
 
 const findByEmail = async (email) => {

@@ -26,6 +26,7 @@ const findById = async (key) => {
         return null;
     }
 };
+
 module.exports = {
     findById
 }

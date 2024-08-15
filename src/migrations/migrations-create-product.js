@@ -20,8 +20,7 @@ module.exports = {
       },
       product_slug: {
         type: Sequelize.STRING,
-        allowNull: false,
-        unique: true,
+
       },
       product_thumb: {
         type: Sequelize.STRING,
@@ -74,6 +73,10 @@ module.exports = {
         defaultValue: false
       },
       product_attributes: {
+        type: Sequelize.JSON,
+        allowNull: false
+      },
+      product_amenities: {
         type: Sequelize.JSON,
         allowNull: false
       },

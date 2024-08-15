@@ -46,4 +46,5 @@ class KeyTokenService {
         return await db.keytokenModels.destroy({ where: { user: userId } });
     }
 }
+
 module.exports = KeyTokenService 

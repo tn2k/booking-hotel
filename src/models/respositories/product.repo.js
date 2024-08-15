@@ -2,9 +2,8 @@
 
 const Sequelize = require("sequelize")
 const db = require('../index');
-const Users = require('../user.model')
 const { getSelectData } = require('../../utils/index');
-const { where } = require('sequelize');
+
 
 const findAllDraftsForUser = async ({ query, limit, skip }) => {
     return await queryProduct({ query, limit, skip })
@@ -70,7 +69,6 @@ const unPublishProductByUser = async ({ product_user, product_id }) => {
     return Product
 }
 
-
 const findAllProducts = async ({ limit, sort, page, filter, select }) => {
     const skip = (page - 1) * limit;
     const sortBy = sort === 'ctime' ? { _id: -1 } : { _id: 1 }
@@ -119,7 +117,6 @@ const queryProduct = async ({ query, limit, skip }) => {
         throw error
     }
 }
-
 
 module.exports = {
     findAllDraftsForUser,

@@ -2,7 +2,6 @@
 const { OK, CREATED, SuccessResponse } = require("../core/success.response")
 const ProductService = require("../services/product.service")
 
-
 const createProduct = async (req, res, next) => {
     new SuccessResponse({
         message: "Create new Product success!",
@@ -84,8 +83,6 @@ const findProducts = async (req, res, next) => {
         })
     }).send(res)
 }
-
-
 
 module.exports = {
     createProduct,

@@ -3,7 +3,6 @@ const { lowerCase } = require('lodash');
 const { DataTypes, Model } = require('sequelize');
 const slugify = require('slugify')
 
-
 module.exports = (sequelize) => {
     class Products extends Model {
         static associate(models) {
@@ -11,6 +10,11 @@ module.exports = (sequelize) => {
             Products.hasMany(models.Users, {
                 foreignKey: 'tenant_id', // Khóa ngoại trong bảng Users
                 as: 'users' // Alias cho mối quan hệ
+            });
+            Products.hasOne(models.Amenities, {
+                foreignKey: 'amenity_id',
+                as: 'amenities',
+                onDelete: 'CASCADE'
             });
         }
     }
@@ -31,6 +35,7 @@ module.exports = (sequelize) => {
         },
         product_slug: {
             type: DataTypes.STRING,
+
         },
         product_thumb: {
             type: DataTypes.STRING,
@@ -88,7 +93,11 @@ module.exports = (sequelize) => {
         product_attributes: {
             type: DataTypes.JSON,
             allowNull: false
-        }
+        },
+        product_amenities: {
+            type: DataTypes.JSON,
+            allowNull: false
+        },
     }, {
         sequelize,
         modelName: 'Products',

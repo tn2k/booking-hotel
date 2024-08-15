@@ -13,36 +13,6 @@ const KeyTokenService = require('./keyToken.service');
 
 
 
-
-
-const regisuser = async ({ email }) => {
-    const user = await db.Users.findOne({
-        where: { email: email }
-    })
-    if (user) {
-        return {
-            code: 400,
-            message: 'This email is already in user!'
-        }
-    }
-    // await deleteExpiredOtps();
-    const OTP = OtpGenerator.generate(6, {
-        digits: true,
-        lowerCaseAlphabets: false,
-        upperCaseAlphabets: false,
-        specialChars: false,
-    })
-    console.log('OTP is : ', OTP)
-    return {
-        code: 200,
-        element: await verifyOtp({
-            email,
-            otp: OTP
-        })
-    }
-}
-
-
 const getAllUsers = async () => {
     try {
         const user = await db.Users.findAll({
@@ -177,13 +147,37 @@ const deleteDataUser = async ({ userId }) => {
     }
 }
 
-
-
 module.exports = {
-    regisuser,
     getAllUsers,
     createUser,
     getDataUser,
     updateDataUser,
     deleteDataUser,
 }
+
+// const regisuser = async ({ email }) => {
+//     const user = await db.Users.findOne({
+//         where: { email: email }
+//     })
+//     if (user) {
+//         return {
+//             code: 400,
+//             message: 'This email is already in user!'
+//         }
+//     }
+//     // await deleteExpiredOtps();
+//     const OTP = OtpGenerator.generate(6, {
+//         digits: true,
+//         lowerCaseAlphabets: false,
+//         upperCaseAlphabets: false,
+//         specialChars: false,
+//     })
+//     console.log('OTP is : ', OTP)
+//     return {
+//         code: 200,
+//         element: await verifyOtp({
+//             email,
+//             otp: OTP
+//         })
+//     }
+// }

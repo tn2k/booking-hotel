@@ -23,20 +23,17 @@ const removeUndefinedObject = obj => {
     return obj
 }
 
-// const updateNestedObjectParser = obj => {
-//     console.log('check obj  1', obj)
-//     const final = {}
-//     Object.keys(obj).forEach(k => {
-//         if (typeof obj[k] === 'Object' && !Array.isArray(obj[k])) {
-//             const response = updateNestedObjectParser(obj[k])
-//             Object.keys(response.forEach(a => {
-//                 final[`${k}.${a}`] = res[a]
-//             }))
-//         }
-//     })
-//     console.log('check obj  2', final)
-//     return final
-// }
+const transformAmenities = (input) => {
+    try {
+        const amenitiesObject = {};
+        Object.values(input).forEach(value => {
+            amenitiesObject[value] = true;
+        });
+        return amenitiesObject
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 const updateNestedObjectParser = (obj) => {
     console.log('check obj  1', obj)
@@ -61,4 +58,20 @@ module.exports = {
     unGetSelectData,
     removeUndefinedObject,
     updateNestedObjectParser,
+    transformAmenities
 }
+
+// const updateNestedObjectParser = obj => {
+//     console.log('check obj  1', obj)
+//     const final = {}
+//     Object.keys(obj).forEach(k => {
+//         if (typeof obj[k] === 'Object' && !Array.isArray(obj[k])) {
+//             const response = updateNestedObjectParser(obj[k])
+//             Object.keys(response.forEach(a => {
+//                 final[`${k}.${a}`] = res[a]
+//             }))
+//         }
+//     })
+//     console.log('check obj  2', final)
+//     return final
+// }
