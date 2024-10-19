@@ -3,8 +3,6 @@ const StatusCode = require("../utils/httpStatusCode")
 const ReasonStatusCode = require("../utils/httpStatusCode")
 
 class ErrorResponse extends Error {
-
-
     constructor(message, status) {
         super(message)
         this.status = status

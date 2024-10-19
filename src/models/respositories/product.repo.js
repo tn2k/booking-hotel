@@ -70,14 +70,21 @@ const unPublishProductByUser = async ({ product_user, product_id }) => {
 }
 
 const findAllProducts = async ({ limit, sort, page, filter, select }) => {
-    const skip = (page - 1) * limit;
-    const sortBy = sort === 'ctime' ? { _id: -1 } : { _id: 1 }
-    const products = await db.Products.findAll(filter)
-        .sort(sortBy)
-        .skip(skip)
-        .limit(limit)
-        .select(getSelectData(select))
-    return products
+    try {
+        const skip = (page - 1) * limit;
+        const sortBy = sort === 'ctime' ? [['createdAt', 'DESC']] : [['createdAt', 'ASC']];
+        const products = await db.Products.findAll({
+            where: filter,
+            order: sortBy,
+            offset: skip,
+            limit: limit,
+            attributes: getSelectData(select)
+        });
+        return products
+    }
+    catch (error) {
+
+    }
 }
 
 const findProduct = async (product_id) => {
@@ -106,7 +113,7 @@ const queryProduct = async ({ query, limit, skip }) => {
                 {
                     model: db.Users,
                     as: 'users',
-                    attributes: ['tenant_id', 'name', 'email'],
+                    attributes: ['tenant_id', 'first_name', 'email'],
                 }
             ],
             order: [['updatedAt', 'DESC']],

@@ -15,12 +15,24 @@ const handlerRefreshToKen = async (req, res, next) => {
 };
 
 const login = async (req, res, next) => {
-  console.log("check data", req.body)
-  new SuccessResponse({
-    message: "Login User success!",
-    metadata: await apiLogin(req.body)
-  }).send(res)
+  try {
+    const data = await apiLogin(req.body);
+    res.cookie('testToken2', '1234567', {
+      httpOnly: true,      // Cookie chỉ gửi qua HTTP
+      secure: false,       // Tắt cho localhost (bật nếu dùng HTTPS)
+      sameSite: 'Lax',     // An toàn với cùng domain
+      maxAge: 60 * 60 * 1000,  // Cookie tồn tại 1 giờ
+    });
+    new SuccessResponse({
+      message: "Login User success!",
+      metadata: data
+    }).send(res);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
 };
+
 
 const signUp = async (req, res, next) => {
   new CREATED({
@@ -37,14 +49,19 @@ const logOut = async (req, res, next) => {
 };
 
 const getListUsers = async (req, res, next) => {
+  res.cookie('testToken2', '1234567', {
+    httpOnly: true,      // Cookie chỉ gửi qua HTTP
+    secure: false,       // Tắt cho localhost (bật nếu dùng HTTPS)
+    sameSite: 'Lax',     // An toàn với cùng domain
+    maxAge: 60 * 60 * 1000,  // Cookie tồn tại 1 giờ
+  });
   new SuccessResponse({
     message: "Get list User success!",
-    metadata: await getAllUsers()
+    metadata: await getAllUsers(),
   }).send(res)
 };
 
 const getEditUser = async (req, res, next) => {
-  console.log("check data userId: req.params.id  ", req.params.id)
   new SuccessResponse({
     message: "Get data User edit success!",
     metadata: await getDataUser({ userId: req.params.id })

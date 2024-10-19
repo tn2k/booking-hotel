@@ -17,6 +17,7 @@ const getAllUsers = async () => {
     try {
         const user = await db.Users.findAll({
             raw: true,
+            attributes: { exclude: ['password'] }
         })
         return {
             code: 400,
@@ -29,7 +30,7 @@ const getAllUsers = async () => {
     }
 }
 
-const createUser = async ({ name, password, email, phone, role }) => {
+const createUser = async ({ first_name, last_name, password, email, phone, role, sex }) => {
     try {
         const user = await db.Users.findOne({
             where: { email: email },
@@ -40,11 +41,13 @@ const createUser = async ({ name, password, email, phone, role }) => {
         else {
             const hashedPassword = await hashPassword(password);
             const newUser = await db.Users.create({
-                name,
+                first_name,
+                last_name,
                 password: hashedPassword,
                 email,
                 phone,
                 role,
+                sex,
                 status: 'inactive',
                 verify: true,
             });
@@ -101,7 +104,6 @@ const getDataUser = async ({ userId }) => {
 }
 
 const updateDataUser = async (dataEditUser) => {
-    console.log('check daaata ', dataEditUser)
     try {
         const user = await db.Users.findByPk(dataEditUser.tenant_id);
         if (!user) {

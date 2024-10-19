@@ -75,6 +75,13 @@ const findAllProducts = async (req, res, next) => {
     }).send(res)
 }
 
+const findAllProducts2 = async (req, res, next) => {
+    new SuccessResponse({
+        message: "Get list findAllProducts success!",
+        metadata: await ProductService.findAllProducts2(req.params)
+    }).send(res)
+}
+
 const findProducts = async (req, res, next) => {
     new SuccessResponse({
         message: "Get list findProducts success!",
@@ -93,5 +100,6 @@ module.exports = {
     getListSearchProduct,
     findAllProducts,
     findProducts,
+    findAllProducts2,
     updateProduct
 };

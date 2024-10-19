@@ -5,7 +5,7 @@ const findByEmail = async (email) => {
     try {
         const user = await db.Users.findOne({
             where: { email },
-            attributes: ['email', "tenant_id", "password", "name"]
+            attributes: ['email', "tenant_id", "password", "first_name"]
         });
         return user;
     } catch (error) {

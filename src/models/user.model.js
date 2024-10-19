@@ -11,7 +11,16 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
-    name: {
+
+    first_name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      trim: true,
+      validate: {
+        len: [1, 150]
+      }
+    },
+    last_name: {
       type: DataTypes.STRING,
       allowNull: false,
       trim: true,
@@ -38,6 +47,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.ENUM('landlord', 'tenant', 'admin'),
       defaultValue: 'tenant'
     },
+    sex: {
+      type: DataTypes.ENUM('Male', 'Female', 'Other'),
+      defaultValue: 'tenant'
+    },
     status: {
       type: DataTypes.ENUM('active', 'inactive'),
       defaultValue: 'inactive'
@@ -52,7 +65,7 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Users.associate = (models) => {
-    Users.hasMany(models.Rental, { foreignKey: 'tenant_id' });
+
     Users.hasMany(models.Rooms, { foreignKey: 'tenant_id' });
     Users.hasMany(models.RoomReview, { foreignKey: 'user_id' });
     Users.hasMany(models.Products, { foreignKey: 'product_user' });

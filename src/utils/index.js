@@ -7,11 +7,11 @@ const getIntoData = ({ fileds = [], object = {} }) => {
 }
 
 const getSelectData = (select = []) => {
-    return Object.fromEntries(select.map(e => [el, 1]))
+    return select;
 }
 
 const unGetSelectData = (select = []) => {
-    return Object.fromEntries(select.map(e => [el, 0]))
+    return select;
 }
 
 const removeUndefinedObject = obj => {

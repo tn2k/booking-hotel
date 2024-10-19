@@ -2,9 +2,9 @@
 const { DataTypes, Model } = require('sequelize');
 
 module.exports = (sequelize) => {
-    class RoomImage extends Model { }
+    class RoomImages extends Model { }
 
-    RoomImage.init({
+    RoomImages.init({
         image_id: {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
@@ -21,12 +21,12 @@ module.exports = (sequelize) => {
         description: DataTypes.TEXT
     }, {
         sequelize,
-        modelName: 'RoomImage'
+        modelName: 'RoomImages'
     });
 
-    RoomImage.associate = (models) => {
-        RoomImage.belongsTo(models.Rooms, { foreignKey: 'room_id' });
+    RoomImages.associate = (models) => {
+        RoomImages.belongsTo(models.Rooms, { foreignKey: 'room_id' });
     };
 
-    return RoomImage;
+    return RoomImages;
 };

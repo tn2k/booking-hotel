@@ -8,9 +8,21 @@ module.exports = {
         defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
       },
-      name: {
+      first_name: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
+        trim: true,
+        validate: {
+          len: [1, 150]
+        }
+      },
+      last_name: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        trim: true,
+        validate: {
+          len: [1, 150]
+        }
       },
       password: {
         type: Sequelize.STRING,
@@ -30,6 +42,9 @@ module.exports = {
         type: Sequelize.ENUM('landlord', 'tenant', 'admin'),
         defaultValue: 'tenant'
       },
+      sex: {
+        type: Sequelize.ENUM('Male', 'Female', 'Other'),
+      },
       status: {
         type: Sequelize.ENUM('active', 'inactive'),
         defaultValue: 'inactive'
@@ -46,6 +61,9 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       }
+
+
+
     });
   },
   // timestamps: true,

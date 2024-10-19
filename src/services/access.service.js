@@ -25,7 +25,7 @@ const apiLogin = async ({ email, password, refreshToken = null }) => {
     if (!foundUser) throw new BadRequestError('User not registered')
 
     // 2.
-    const match = bcrypt.compare(password, foundUser.password)
+    const match = await bcrypt.compare(password, foundUser.password)
     if (!match) throw new AuthFailureError(" Authentication error")
     // 3.
     const keypair = forge.pki.rsa.generateKeyPair(2048);
@@ -41,7 +41,7 @@ const apiLogin = async ({ email, password, refreshToken = null }) => {
         refreshToken: tokens.refreshToken
     })
 
-    const userInfo = getInforData({ fields: ['tenant_id', 'name', 'email'], object: foundUser });
+    const userInfo = getInforData({ fields: ['tenant_id', 'first_name', 'email'], object: foundUser });
     return {
         User: userInfo,
         tokens

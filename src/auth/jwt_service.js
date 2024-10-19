@@ -4,10 +4,10 @@ const { AuthFailureError, NotFoundError } = require("../core/error.response");
 const { asyncHandler } = require("../helpers/asyncHandler");
 const { findByUserId } = require("../services/keyToken.service");
 const HEADER = {
-    API_KEY: 'x-api-key',
-    CLIENT_DI: "x-client-id",
+    API_KEY: 'xapikey',
+    CLIENT_DI: "xclientid",
     AUTHORIZATION: 'athorization',
-    REFRESHTOKEN: 'x-rtoken-id'
+    REFRESHTOKEN: 'xrtokenid'
 }
 
 const createTokenPair = async ({ payload, publicKey, privateKey }) => {
@@ -22,9 +22,9 @@ const createTokenPair = async ({ payload, publicKey, privateKey }) => {
         })
         JWT.verify(accessToken, publicKey, (err, decode) => {
             if (err) {
-                console.error('error verify :', err)
+                console.error(err)
             } else {
-                console.log(` decode verify ::`, decode)
+                console.log(decode)
             }
         })
         return { accessToken, refreshToken }

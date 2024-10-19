@@ -37,12 +37,12 @@ class ProductFactory {
     }
     // END PUT // 
 
-    static async findAllDraftsForUser({ product_user, limit = 50, skip = 0 }) {
+    static async findAllDraftsForUser({ product_user, limit = 12, skip = 0 }) {
         const query = { product_user, isDraft: true }
         return await findAllDraftsForUser({ query, limit, skip })
     }
 
-    static async findAllPublishForShop({ product_user, limit = 50, skip = 0 }) {
+    static async findAllPublishForShop({ product_user, limit = 12, skip = 0 }) {
         const query = { product_user, isPublished: true }
         return await findAllPublishForShop({ query, limit, skip })
     }
@@ -51,10 +51,17 @@ class ProductFactory {
         return await searchProductByUser({ keySearch })
     }
 
-    static async findAllProducts({ limit = 50, sort = ' ctime', page = 1, filter = { isPublished: true } }) {
+    static async findAllProducts({ limit = 12, sort = ' ctime', page = 1, filter = { isPublished: true } }) {
         return await findAllProducts({
             limit, sort, filter, page,
-            select: ['product_name', 'product_price', 'product_thumb']
+            select: ['product_id', 'product_name', 'product_price', 'product_thumb', 'product_type', 'product_size', 'product_address', 'product_ratingsAverage']
+        })
+    }
+
+    static async findAllProducts2({ limit = 4, sort = ' ctime', page = 1, filter = { isPublished: true } }) {
+        return await findAllProducts({
+            limit, sort, filter, page,
+            select: ['product_id', 'product_name', 'product_price', 'product_thumb', 'product_type', 'product_size', 'product_address', 'product_ratingsAverage']
         })
     }
 
