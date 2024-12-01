@@ -20,11 +20,11 @@ app.use(express.json())
 app.use(express.urlencoded({
   extended: true
 }))
-app.use(cors());
+
 app.use(cors({
   origin: 'http://localhost:3000',
-  methods: ['POST', 'GET', 'PATCH', 'DELETE', 'PUT'],// Chỉ cho phép truy cập từ domain này
-  credentials: true
+  methods: ['POST', 'GET', 'PATCH', 'DELETE', 'PUT'],
+  credentials: true,
 }));
 
 // init db

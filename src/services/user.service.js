@@ -20,8 +20,8 @@ const getAllUsers = async () => {
             attributes: { exclude: ['password'] }
         })
         return {
-            code: 400,
-            message: 'get all user fail!',
+            code: 200,
+            message: 'get all user success!',
             data: user
         }
     } catch (error) {

@@ -1,7 +1,7 @@
 const express = require('express')
 const routes = express.Router()
-const { signUp, login, logOut, handlerRefreshToKen, getEditUser, updateUser, deleteUser, getListUsers } = require('../../controllers/access.Controller')
-const { authentication } = require('../../auth/jwt_service')
+const { signUp, login, logOut, handlerRefreshToKen, getEditUser, updateUser, deleteUser, getListUsers, checkAuth } = require('../../controllers/access.Controller')
+const { authenticationV1 } = require('../../auth/jwt_service')
 const { asyncHandler } = require("../../helpers/asyncHandler")
 
 // SignUp 
@@ -11,9 +11,9 @@ routes.get('/getListUsers', asyncHandler(getListUsers))
 routes.get('/editUser/:id', asyncHandler(getEditUser))
 
 // authentication 
-routes.use(authentication)
+routes.use(authenticationV1)
 //////////////////////////
-
+routes.get('/', asyncHandler(checkAuth))
 routes.patch('/patchUser', asyncHandler(updateUser))
 routes.delete('/deleteUser/:id', asyncHandler(deleteUser))
 

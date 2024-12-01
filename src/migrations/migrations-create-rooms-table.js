@@ -12,11 +12,11 @@ module.exports = {
         type: Sequelize.UUID,
         allowNull: false,
       },
-      room_description: {
+      product_description: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      room_rules: {
+      product_rules: {
         type: Sequelize.STRING,
         allowNull: false,
       },

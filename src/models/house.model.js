@@ -17,15 +17,15 @@ module.exports = (sequelize) => {
                 key: 'tenant_id'
             }
         },
-        house_description: {
+        product_description: {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        house_detail: {
+        product_detail: {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        house_rules: {
+        product_rules: {
             type: DataTypes.STRING,
             allowNull: false,
         },

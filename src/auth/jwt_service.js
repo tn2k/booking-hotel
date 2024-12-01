@@ -3,6 +3,9 @@ const createError = require('http-errors');
 const { AuthFailureError, NotFoundError } = require("../core/error.response");
 const { asyncHandler } = require("../helpers/asyncHandler");
 const { findByUserId } = require("../services/keyToken.service");
+const { handlerRefreshToken } = require("../services/access.service");
+const { getCookieValue } = require("../utils/index")
+
 const HEADER = {
     API_KEY: 'xapikey',
     CLIENT_DI: "xclientid",
@@ -14,7 +17,7 @@ const createTokenPair = async ({ payload, publicKey, privateKey }) => {
     try {
         const accessToken = await JWT.sign(payload, privateKey, {
             algorithm: 'RS256',
-            expiresIn: '2 days',
+            expiresIn: '15m',
         })
         const refreshToken = await JWT.sign(payload, privateKey, {
             algorithm: 'RS256',
@@ -34,7 +37,8 @@ const createTokenPair = async ({ payload, publicKey, privateKey }) => {
     }
 }
 
-const authentication = asyncHandler(async (req, res, next) => {
+
+const authenticationV1 = asyncHandler(async (req, res, next) => {
     /*
         1 - Check userId missing ??? 
         2 - get accessToken 
@@ -43,40 +47,53 @@ const authentication = asyncHandler(async (req, res, next) => {
         5 - check keyStore with this UserId 
         6 - Ok all => return next()
     */
-    // 1 
-    const userId = req.headers[HEADER.CLIENT_DI]
+    // const accessToken = req.headers[HEADER.AUTHORIZATION]
+    // const refreshToken = req.headers[HEADER.REFRESHTOKEN]
+    // const userId = req.headers[HEADER.CLIENT_DI]
+
+    const cookieString = req.headers.cookie
+    const accessToken = getCookieValue(cookieString, 'accessToken');
+    const refreshToken = getCookieValue(cookieString, 'refreshToken');
+    const userId = getCookieValue(cookieString, 'userId');
+
     if (!userId) throw new AuthFailureError("Invalid Request ")
 
-    // 2 
     const keyStore = await findByUserId(userId)
     if (!keyStore) throw new NotFoundError("Not found KeyStore")
 
-    // 3 
-    if (req.headers[HEADER.REFRESHTOKEN]) {
-        try {
-            const refreshToken = req.headers[HEADER.REFRESHTOKEN]
-            const decodeUser = JWT.verify(refreshToken, keyStore.privatekey)
-            if (userId !== decodeUser.userId) throw new AuthFailureError("Invalid Userid")
-            req.keyStore = keyStore
-            req.user = decodeUser
-            req.refreshToken = refreshToken
-            return next()
-        } catch (error) {
-            throw error
-        }
-    }
-
-    const accessToken = req.headers[HEADER.AUTHORIZATION]
-    if (!accessToken) throw new AuthFailureError("Invalid Request ")
-
-    try {
-        const decodeUser = JWT.verify(accessToken, keyStore.publickey)
-        if (userId !== decodeUser.userId.toString()) throw new AuthFailureError("Invalid Userid")
+    if (!accessToken) {
+        if (!refreshToken) throw new AuthFailureError("Invalid Request")
+        const decodeUser = await JWT.verify(refreshToken, keyStore.privatekey)
+        if (userId !== decodeUser.userId) throw new AuthFailureError("Invalid Userid")
+        const response = await handlerRefreshToken({ refreshToken, decodeUser, keyStore })
         req.keyStore = keyStore
+        req.user = decodeUser
+        res.cookie('accessToken', response.tokens.accessToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'Strict',
+            maxAge: 15 * 60 * 1000,
+        });
+        res.cookie('refreshToken', response.tokens.refreshToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'Strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+        res.cookie('userId', userId, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'Strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
         return next()
-    } catch (error) {
-        throw error
     }
+    const decodeUser = await JWT.verify(accessToken, keyStore.publickey, { algorithms: ['RS256'] });
+    if (userId !== decodeUser?.userId?.toString()) throw new AuthFailureError("Invalid Userid")
+    console.log(decodeUser)
+    req.keyStore = keyStore
+    req.user = decodeUser
+    return next()
 })
 
 const verifyJWT = async (token, keySecret) => {
@@ -102,72 +119,9 @@ const verifyAccessToken = (req, res, next) => {
     })
 }
 
-
 module.exports = {
     createTokenPair,
-    authentication,
+    authenticationV1,
     verifyJWT,
     verifyAccessToken,
 };
-
-// const signAccessToken = async (userId, publicKey, privateKey) => {
-//     return new Promise((resolve, reject) => {
-//         const userId = {
-//             tenant_id
-//         };
-//         console.log('check tenant_id :', userId)
-//         const secret = publicKey // Nên sử dụng một biến môi trường cho key bí mật của bạn
-//         const options = {
-//             expiresIn: '60s'
-//         };
-//         JWT.sign(payload, secret, options, (err, token) => {
-//             if (err) {
-//                 reject(err);
-//             }
-//             resolve(token);
-//         });
-//     });
-// };
-
-
-
-// const singRefreshToken = async (tenant_id) => {
-//     return new Promise((resolve, reject) => {
-//         const payload = {
-//             tenant_id
-//         };
-//         const secret = process.env.REFRESH_TOKEN_SECRET; // Nên sử dụng một biến môi trường cho key bí mật của bạn
-//         const options = {
-//             expiresIn: '1y' // 10m 10s
-//         };
-//         JWT.sign(payload, secret, options, (err, token) => {
-//             if (err) reject(err);
-//             client.set(tenant_id.toString(), token, { EX: 60 * 60 * 24 * 365 }, (err, reply) => {
-//                 if (err) {
-//                     return reject(createError.InternalServerError())
-//                 }
-//             })
-//             resolve(token);
-//         });
-//     });
-// }
-
-// const verifyRefreshToken = async (refreshToken) => {
-//     return new Promise((resolve, reject) => {
-//         JWT.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, payload) => {
-//             if (err) {
-//                 return reject(err)
-//             }
-//             client.get(payload.tenant_id, (err, reply) => {
-//                 if (err) {
-//                     return reject(createError.InternalServerError())
-//                 }
-//                 if (refreshToken === reply) {
-//                     return resolve(payload);
-//                 }
-//                 return reject(createError.Unauthorized())
-//             })
-//             resolve(payload)
-//         })
-//     })
-// }

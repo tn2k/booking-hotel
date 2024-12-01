@@ -22,8 +22,8 @@ module.exports = {
         type: Sequelize.STRING,
 
       },
-      product_thumb: {
-        type: Sequelize.STRING,
+      product_image: {
+        type: Sequelize.JSON,
         allowNull: false,
       },
       product_price: {
@@ -82,11 +82,11 @@ module.exports = {
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       }
     });
   },

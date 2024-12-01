@@ -12,15 +12,15 @@ module.exports = {
         type: Sequelize.UUID,
         allowNull: false,
       },
-      house_description: {
+      product_description: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      house_detail: {
+      product_detail: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      house_rules: {
+      product_rules: {
         type: Sequelize.STRING,
         allowNull: false,
       },

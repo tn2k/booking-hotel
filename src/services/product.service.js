@@ -4,20 +4,57 @@ const db = require('../models/index')
 const { BadRequestError } = require("../core/error.response")
 const { findAllDraftsForUser, publishProductByUser, findAllPublishForShop, unPublishProductByUser, searchProductByUser, findAllProducts, findProduct } = require("../models/respositories/product.repo")
 const { removeUndefinedObject, updateNestedObjectParser, transformAmenities } = require("../utils/index")
+const cloudinary = require("../config/cloudinary");
 
 class ProductFactory {
-    static async createProduct(type, payload) {
-        switch (type) {
-            case "Room":
-                return new Room(payload).createProduct()
-            case "House":
-                return new House(payload).createProduct()
-            default:
-                throw new BadRequestError(`Invalid Product Type ${type}`)
+    static async createProduct(type, product_image, payload) {
+        try {
+            if (!product_image.length) return
+            const imageData = []
+            for (const file of product_image) {
+                const result = await cloudinary.v2.uploader.upload(file.path, {
+                    asset_folder: 'products',
+                    resource_type: 'image',
+                    width: 384,
+                    height: 250,
+                    crop: "scale"
+                })
+                imageData.push({
+                    url: result.secure_url,
+                    public_id: result.public_id
+                })
+            }
+            payload.product_image = imageData;
+            switch (type) {
+                case "Room":
+                    return new Room(payload).createProduct()
+                case "House":
+                    return new House(payload).createProduct()
+                default:
+                    throw new BadRequestError(`Invalid Product Type ${type}`)
+            }
+        } catch (error) {
+            console.log(error)
         }
     }
 
-    static async updateProduct(type, productId, payload) {
+    static async updateProduct(type, productId, product_image, payload) {
+        if (!product_image.length) return
+        const imageData = []
+        for (const file of product_image) {
+            const result = await cloudinary.v2.uploader.upload(file.path, {
+                asset_folder: 'products',
+                resource_type: 'image',
+                width: 384,
+                height: 250,
+                crop: "scale"
+            })
+            imageData.push({
+                url: result.secure_url,
+                public_id: result.public_id
+            })
+        }
+        payload.product_image = imageData;
         switch (type) {
             case "Room":
                 return new Room(payload).updateProduct(productId)
@@ -54,14 +91,14 @@ class ProductFactory {
     static async findAllProducts({ limit = 12, sort = ' ctime', page = 1, filter = { isPublished: true } }) {
         return await findAllProducts({
             limit, sort, filter, page,
-            select: ['product_id', 'product_name', 'product_price', 'product_thumb', 'product_type', 'product_size', 'product_address', 'product_ratingsAverage']
+            select: ['product_id', 'product_name', 'product_price', 'product_image', 'product_type', 'product_size', 'product_address', 'product_ratingsAverage']
         })
     }
 
     static async findAllProducts2({ limit = 4, sort = ' ctime', page = 1, filter = { isPublished: true } }) {
         return await findAllProducts({
             limit, sort, filter, page,
-            select: ['product_id', 'product_name', 'product_price', 'product_thumb', 'product_type', 'product_size', 'product_address', 'product_ratingsAverage']
+            select: ['product_id', 'product_name', 'product_price', 'product_image', 'product_type', 'product_size', 'product_address', 'product_ratingsAverage']
         })
     }
 
@@ -72,11 +109,11 @@ class ProductFactory {
 
 class Product {
     constructor({
-        product_name, product_thumb, product_price, product_quantity,
+        product_name, product_image, product_price, product_quantity,
         product_type, product_size, product_address, product_attributes, product_user, product_amenities
     }) {
         this.product_name = product_name
-        this.product_thumb = product_thumb
+        this.product_image = product_image
         this.product_price = product_price
         this.product_quantity = product_quantity
         this.product_type = product_type
@@ -86,17 +123,19 @@ class Product {
         this.product_attributes = product_attributes
         this.product_amenities = product_amenities
     }
-
     // create new product
     async createProduct(id) {
-        const productData = {
-            ...this,
-            product_id: id
-        };
-        return await db.Products.create(productData);
+        try {
+            const productData = {
+                ...this,
+                product_id: id
+            };
+            return await db.Products.create(productData);
+        } catch (error) {
+            console.log(error)
+        }
     }
 
-    // Update product
     async updateProduct(productId, bodyUpdate) {
         await db.Products.update(bodyUpdate, {
             where: {
@@ -107,33 +146,36 @@ class Product {
         return updatedProduct
     }
 }
-// findByIdAndUpdate({ productId, bodyUpdate, model: Products })
+
 class Room extends Product {
     async createProduct() {
-        try {
-            const newRoom = await db.Rooms.create({
-                ...this.product_attributes,
-                product_user: this.product_user
-            })
-            if (!newRoom) throw new BadRequestError("create new Room error")
-            const dataNewAmenities = transformAmenities({ ...this.product_amenities })
-            const newAmenities = await db.Amenities.create({
-                ...dataNewAmenities,
-                amenity_id: newRoom.room_id
-            })
-            if (!newAmenities) throw new BadRequestError("create new Amenities error")
-            const newProduct = await super.createProduct(newRoom.room_id)
-            if (!newProduct) throw new BadRequestError("create new Product error")
-            return newProduct
-        } catch (error) {
-            throw error
-        }
+        const newRoom = await db.Rooms.create({
+            ...this.product_attributes,
+            product_user: this.product_user
+        })
+        if (!newRoom) throw new BadRequestError("create new Room error")
+
+        const newImage = await db.ProductImages.create({
+            ...this.product_image,
+            image_id: newRoom.room_id
+        })
+        if (!newImage) throw new BadRequestError("create new Image error")
+
+        const dataNewAmenities = transformAmenities({ ...this.product_amenities })
+        const newAmenities = await db.Amenities.create({
+            ...dataNewAmenities,
+            amenity_id: newRoom.room_id
+        })
+        if (!newAmenities) throw new BadRequestError("create new Amenities error")
+        const newProduct = await super.createProduct(newRoom.room_id)
+        if (!newProduct) throw new BadRequestError("create new Product error")
+        return newProduct
     }
 
     async updateProduct(productId) {
         //1. remove attr has null underfined
         const objectParams = removeUndefinedObject(this)
-        //2. check xem update o cho nao ? 
+        //2. check  update ? 
         if (objectParams.product_attributes) {
             await db.Rooms.update(updateNestedObjectParser(objectParams.product_attributes), {
                 where: {
@@ -153,6 +195,20 @@ class House extends Product {
             product_user: this.product_user
         })
         if (!newHouse) throw new BadRequestError("create new House error")
+
+        const newImage = await db.ProductImages.create({
+            ...this.product_image,
+            image_id: newHouse.house_id
+        })
+        if (!newImage) throw new BadRequestError("create new Image error")
+
+        const dataNewAmenities = transformAmenities({ ...this.product_amenities })
+        const newAmenities = await db.Amenities.create({
+            ...dataNewAmenities,
+            amenity_id: newHouse.house_id
+        })
+        if (!newAmenities) throw new BadRequestError("create new Amenities error")
+
         const newProduct = await super.createProduct(newHouse.house_id)
         if (!newProduct) throw new BadRequestError("create new Product error")
         return newProduct

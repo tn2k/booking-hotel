@@ -17,11 +17,11 @@ module.exports = (sequelize) => {
                 key: 'tenant_id'
             }
         },
-        room_description: {
+        product_description: {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        room_rules: {
+        product_rules: {
             type: DataTypes.STRING,
             allowNull: false,
         },

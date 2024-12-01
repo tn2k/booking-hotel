@@ -1,17 +1,48 @@
 
 const { OK, CREATED, SuccessResponse } = require("../core/success.response")
+const { BadRequestError } = require("../core/error.response")
 const ProductService = require("../services/product.service")
+const cloudinary = require("../config/cloudinary");
+
 
 const createProduct = async (req, res, next) => {
+    const data = req.body;
+    const product_image = req.files;
+    if (!product_image.length) {
+        throw new BadRequestError("File image missing")
+    }
+    const productAttributes = JSON.parse(data.product_attributes);
+    const productAmenities = JSON.parse(data.product_amenities);
+    data.product_attributes = productAttributes;
+    data.product_amenities = productAmenities;
     new SuccessResponse({
         message: "Create new Product success!",
-        metadata: await ProductService.createProduct(req.body.product_type, {
+        metadata: await ProductService.createProduct(req.body.product_type, product_image, {
             ...req.body,
             product_user: req.user.userId
         })
     }).send(res)
 };
-// QUERY //
+
+const updateProduct = async (req, res, next) => {
+    const data = req.body;
+    const product_image = req.files;
+    if (!product_image.length) {
+        throw new BadRequestError("File image missing")
+    }
+    const productAttributes = JSON.parse(data.product_attributes);
+    const productAmenities = JSON.parse(data.product_amenities);
+    data.product_attributes = productAttributes;
+    data.product_amenities = productAmenities;
+    new SuccessResponse({
+        message: "Update Product success!",
+        metadata: await ProductService.updateProduct(req.body.product_type, req.params.productId, product_image, {
+            ...req.body,
+            product_user: req.user.userId,
+        })
+    }).send(res)
+}
+
 const getAllDraftForUser = async (req, res, next) => {
     new SuccessResponse({
         message: "Get list Draft success!",
@@ -19,22 +50,12 @@ const getAllDraftForUser = async (req, res, next) => {
             product_user: req.user.userId
         })
     }).send(res)
-}
+};
 
 const getAllPublishForUser = async (req, res, next) => {
     new SuccessResponse({
         message: "Get list Publish success!",
         metadata: await ProductService.findAllPublishForShop({
-            product_user: req.user.userId
-        })
-    }).send(res)
-}
-
-const updateProduct = async (req, res, next) => {
-    new SuccessResponse({
-        message: "Update Product success!",
-        metadata: await ProductService.updateProduct(req.body.product_type, req.params.productId, {
-            ...req.body,
             product_user: req.user.userId
         })
     }).send(res)

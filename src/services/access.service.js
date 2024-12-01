@@ -4,10 +4,11 @@ const bcrypt = require('bcrypt');
 const forge = require('node-forge');
 const { BadRequestError, ForbiddenError, AuthFailureError } = require("../core/error.response")
 const KeyTokenService = require('./keyToken.service');
-const { createTokenPair } = require('../auth/jwt_service');
+const { createTokenPair } = require('../auth/createTokenPair');
 const { findByEmail } = require('./findByEmail.service');
 const { createKeyToken } = require('./keyToken.service')
 const { getInforData } = require('../utils/getInforData')
+const db = require('../models/index');
 
 
 const apiLogin = async ({ email, password, refreshToken = null }) => {
@@ -54,10 +55,10 @@ const logout = async (keyStore) => {
 }
 
 // check this token used
-const handlerRefreshToken = async ({ refreshToken, user, keyStore }) => {
-    const { userId, email } = user;
+const handlerRefreshToken = async ({ refreshToken, decodeUser, keyStore }) => {
+    const { userId, email } = decodeUser;
 
-    if (keyStore, refreshTokensUsed.includes(refreshToken)) {
+    if (keyStore.refreshTokensUsed.includes(refreshToken)) {
         await KeyTokenService.deleteKeyById(userId)
         throw new ForbiddenError("Something wrong happend !! pls relogin")
     }
@@ -71,20 +72,45 @@ const handlerRefreshToken = async ({ refreshToken, user, keyStore }) => {
     // create due token 
     const tokens = await createTokenPair({ payload: { userId, email }, publicKey: keyStore.publickey, privateKey: keyStore.privatekey })
 
+    const currentTokens = await db.keytokenModels.findOne({
+        where: { user: userId },
+        attributes: ['refreshTokensUsed'],
+        raw: true
+    })
+
+    let refreshTokensUsed = currentTokens ? currentTokens.refreshTokensUsed : [];
+    if (typeof refreshTokensUsed === 'string') {
+        refreshTokensUsed = JSON.parse(refreshTokensUsed);
+    }
+
     // update token
     await keyStore.update({
         refreshToken: tokens.refreshToken,
-        refreshTokensUsed: [...holderToken.refreshTokensUsed, refreshToken]
+        refreshTokensUsed: [...refreshTokensUsed, refreshToken]
     });
 
     return {
-        user: { userId, email },
         tokens
     }
+}
+
+
+
+const checkAuthUser = async ({ decodeUser }) => {
+    const { email } = decodeUser;
+
+    const foundUser = await findByEmail(email)
+    if (!foundUser) throw new BadRequestError('User not registered')
+
+    const userInfo = getInforData({ fields: ['tenant_id', 'first_name', 'email'], object: foundUser });
+    return {
+        User: userInfo,
+    };
 }
 
 module.exports = {
     apiLogin,
     logout,
     handlerRefreshToken,
+    checkAuthUser
 }

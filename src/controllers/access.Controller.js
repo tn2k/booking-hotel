@@ -1,14 +1,14 @@
 const createHttpError = require("http-errors");
 const { getAllUsers, createUser, getDataUser, updateDataUser, deleteDataUser } = require("../services/user.service");
 const { OK, CREATED, SuccessResponse } = require("../core/success.response")
-const { apiLogin, logout, handlerRefreshToken } = require("../services/access.service");
+const { apiLogin, logout, handlerRefreshToken, checkAuthUser } = require("../services/access.service");
 
 const handlerRefreshToKen = async (req, res, next) => {
   new SuccessResponse({
     message: "Get token User success!",
     metadata: await handlerRefreshToken({
       refreshToken: req.refreshToken,
-      user: req.user,
+      decodeUser: req.user,
       keyStore: req.keyStore
     })
   }).send(res)
@@ -17,11 +17,23 @@ const handlerRefreshToKen = async (req, res, next) => {
 const login = async (req, res, next) => {
   try {
     const data = await apiLogin(req.body);
-    res.cookie('testToken2', '1234567', {
+    res.cookie('accessToken', data.tokens.accessToken, {
       httpOnly: true,      // Cookie chỉ gửi qua HTTP
       secure: false,       // Tắt cho localhost (bật nếu dùng HTTPS)
-      sameSite: 'Lax',     // An toàn với cùng domain
-      maxAge: 60 * 60 * 1000,  // Cookie tồn tại 1 giờ
+      sameSite: 'Strict',     // Ngăn chặn CSRF
+      maxAge: 15 * 60 * 1000,   // Thời gian tồn tại của access token
+    });
+    res.cookie('refreshToken', data.tokens.refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'Strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // Thời gian tồn tại của refresh token
+    });
+    res.cookie('userId', data.User.tenant_id, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'Strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000
     });
     new SuccessResponse({
       message: "Login User success!",
@@ -33,6 +45,12 @@ const login = async (req, res, next) => {
   }
 };
 
+const checkAuth = async (req, res, next) => {
+  new SuccessResponse({
+    message: "check Auth User success!",
+    metadata: await checkAuthUser({ decodeUser: req.user })
+  }).send(res)
+};
 
 const signUp = async (req, res, next) => {
   new CREATED({
@@ -42,19 +60,17 @@ const signUp = async (req, res, next) => {
 };
 
 const logOut = async (req, res, next) => {
+  const response = await logout(req.keyStore)
+  res.clearCookie('accessToken');
+  res.clearCookie('refreshToken');
+  res.clearCookie('userId');
   new SuccessResponse({
     message: "logout User success !",
-    metadata: await logout(req.keyStore)
+    metadata: response
   }).send(res)
 };
 
 const getListUsers = async (req, res, next) => {
-  res.cookie('testToken2', '1234567', {
-    httpOnly: true,      // Cookie chỉ gửi qua HTTP
-    secure: false,       // Tắt cho localhost (bật nếu dùng HTTPS)
-    sameSite: 'Lax',     // An toàn với cùng domain
-    maxAge: 60 * 60 * 1000,  // Cookie tồn tại 1 giờ
-  });
   new SuccessResponse({
     message: "Get list User success!",
     metadata: await getAllUsers(),
@@ -91,94 +107,5 @@ module.exports = {
   getEditUser,
   updateUser,
   deleteUser,
+  checkAuth,
 };
-
-// const getEditUsers = async (req, res, next) => {
-//   let userId = req.params.id;
-//   try {
-//     const userEdit = await getDataUser(userId);
-//     return res.render("editCRUD.ejs", { updateUser: [userEdit.data] });
-//   } catch (error) {
-//     console.error("Error retrieving user:", error);
-//     return res.status(500).send("Internal Server Error");
-//   }
-// };
-
-// const deleteUser = async (req, res, next) => {
-//   let userId = req.params.id;
-//   try {
-//     const deleteUser = await deleteDataUser(userId);
-//     return res.status(201).json({
-//       StatusCode: deleteUser.StatusCode,
-//       message: deleteUser.message,
-//     });
-//   } catch (error) {
-//     console.error("Error Delete user:", error);
-//     return res.status(500).send("Internal Server Error");
-//   }
-// };
-
-// const verifyOtp = async (req, res, next) => {
-//     try {
-//         const {
-//             email,
-//             otp,
-//         } = req.body;
-//         const {
-//             code,
-//             elements,
-//             message
-//         } = await verifyotp({
-//             email,
-//             otp
-//         });
-//         return res.status(code).json({
-//             code,
-//             message,
-//             elements
-//         })
-
-//     } catch (error) {
-//         next(error)
-//     }
-// }
-
-// const regisUser = async (req, res, next) => {
-//     try {
-//         const {
-//             email
-//         } = req.body;
-//         const {
-//             code,
-//             message,
-//             elements
-//         } = await regisuser({
-//             email
-//         })
-//         return res.status(code).json({
-//             code,
-//             message,
-//             elements
-//         })
-//     } catch (error) {
-//         console.error(error)
-//         next(error)
-//     }
-// }
-
-// const refreshToken = async (req, res, next) => {
-//     try {
-//         const { refreshToken } = req.body;
-//         if (!refreshToken) throw createError.BadRequest();
-//         const payload = await verifyRefreshToken(refreshToken);
-//         const accessToken = await signAccessToken(payload.tenant_id);
-//         const refToken = await singRefreshToken(payload.tenant_id);
-//         res.json({
-//             accessToken,
-//             refreshToken: refToken
-//         })
-//     } catch (error) {
-//         console.error(error)
-//         next(error)
-//     }
-// }

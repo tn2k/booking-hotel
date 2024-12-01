@@ -52,13 +52,20 @@ const updateNestedObjectParser = (obj) => {
     return final;
 };
 
+const getCookieValue = (cookieString, cookieName) => {
+    const regex = new RegExp(`(?:^|;\\s*)${cookieName}=([^;]*)`);
+    const match = cookieString.match(regex);
+    return match ? decodeURIComponent(match[1]) : null;
+};
+
 module.exports = {
     getIntoData,
     getSelectData,
     unGetSelectData,
     removeUndefinedObject,
     updateNestedObjectParser,
-    transformAmenities
+    transformAmenities,
+    getCookieValue
 }
 
 // const updateNestedObjectParser = obj => {
